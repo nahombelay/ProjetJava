@@ -23,8 +23,13 @@ public class Login {
 		 *  	- sends his new login and userID to all users 
 		 *  	- every other user saves it to their own database and sends ACK
 		 * 
+		 * First login:
+		 * 	- sends broadcast, receives nothing so can adds himself in database
 		 */
 	}
 	
-	
+	/**
+	 * Un thread qui tourne en permanance pour le serveur et le client
+	 * De 0 à n thread selon le nombre de conversation: une convo un thread	
+	 */
 }

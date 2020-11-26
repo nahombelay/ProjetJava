@@ -13,9 +13,10 @@ public class Client {
 		clientSocket = new Socket(ip, port);
 	}
 	
+	
 	public static void main(String[] args) throws IOException {
 		
-		Client C = new Client("127.0.0.1", 6666);
+		Client C = new Client("127.0.0.1", 2222);
 		
 		System.out.println("[Client] Connection acceptée");
 		

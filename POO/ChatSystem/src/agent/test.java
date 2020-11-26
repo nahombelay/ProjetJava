@@ -9,8 +9,6 @@ public class test {
 		Server S = new Server(6666);
 		Client C = new Client("127.0.0.1", 6666);
 		
-		S.run();
-		C.run();
 
 	}
 

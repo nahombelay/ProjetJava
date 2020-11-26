@@ -4,13 +4,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.*;
 import java.util.Date;
-
+import display.DisplayMessage;
 
 public class Server implements Runnable {
 	
 	private static ServerSocket sock;
 	private static Socket link;
 	private static PrintWriter out;
+	private DisplayMessage DM;  
 	
 	public Server (int port) throws IOException {
 
@@ -22,6 +23,8 @@ public class Server implements Runnable {
 			e1.printStackTrace();
 		}
 		
+		DM = new DisplayMessage();
+		
 		System.out.println("[Server] Connection acceptée");
 
 	}
@@ -29,9 +32,8 @@ public class Server implements Runnable {
 	
 	public void run() {
 		
-		System.out.println("[Server] Envoie de la date");
+		System.out.println("[Server] Envoie message");
 		
-		Date date = new Date();
 
 		try {
 			out = new PrintWriter(link.getOutputStream(), true);
@@ -39,9 +41,9 @@ public class Server implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		out.println(date.toString());
+		out.println(DM.readInput());
 		
-		System.out.println("[Server] Date Envoyée");
+		System.out.println("[Server] Message Envoyée");
 		
 		out.close();
 		try {
@@ -56,7 +58,7 @@ public class Server implements Runnable {
 
 	public static void main(String[] args) throws IOException {
 
-			Server S = new Server(5020);
+			Server S = new Server(2222);
 			
 			S.run();
 	
