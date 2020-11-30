@@ -4,6 +4,8 @@ public class Login {
 	
 	private String login;
 	
+	//peut etre ajouter @IP
+	
 	public Login(String login) {
 		this.login = login;
 	}
@@ -13,6 +15,7 @@ public class Login {
 	}
 
 	public void setLogin(String login) {
+	 //verifier s'il est libre avant de l'affecter sinon ca peut poser problème 
 		this.login = login;
 		
 		//TODO: broadcast to other users that login has changed 
@@ -32,4 +35,7 @@ public class Login {
 	 * Un thread qui tourne en permanance pour le serveur et le client
 	 * De 0 à n thread selon le nombre de conversation: une convo un thread	
 	 */
+	
+	
+	
 }

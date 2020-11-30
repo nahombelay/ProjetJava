@@ -25,12 +25,16 @@ public class ThreadTCP extends Thread{
 		      message = in.readLine();
 		      out.println("Bonjour " + message);
 
-		      BroadcastUDP.broadcast("Hello", InetAddress.getByName("255.255.255.255"), 10000);
+		      //BroadcastUDP.broadcast("Hello", InetAddress.getByName("255.255.255.255"), 20000);
 		      socket.close();
 		      
 	    } catch (Exception e) {
 	      e.printStackTrace();
 	    }
 	  }
+	
+	/**
+	 * Ecouter sur un port (pour udp) : nc -ul 10000
+	 */
 	
 }
