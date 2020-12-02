@@ -1,14 +1,22 @@
 package agent;
-
+ 
 import java.io.IOException;
 import java.net.*;
+
+import communications.SendUDP;
+import database.ActiveUsers;
+import user.Login;
 
 public class ListenUsers extends Thread {
 	
 	final static int port = 20000; 
 	private DatagramSocket server;
+	private Login login;
+	private ActiveUsers usersDatabase;
 
-	public ListenUsers()  {
+	public ListenUsers(Login login, ActiveUsers usersDatabase)  {
+		this.login = login;
+		this.usersDatabase = usersDatabase;
 		try {
 			this.server = new DatagramSocket(port);
 		} catch (SocketException e) {
@@ -17,6 +25,7 @@ public class ListenUsers extends Thread {
 	}
 	
 	public void run() {
+		String[] udpinfo;
 		System.out.println("[Listening...]");
 		try {
 			
@@ -30,17 +39,48 @@ public class ListenUsers extends Thread {
                 //Elle bloque le thread jusqu'à ce que celui-ci ait reçu quelque chose.
                 server.receive(packet);
                 
+                /**
+                 * UDP packet format
+                 * [HDR]:login:ip
+                 */
+                
               //nous récupérons le contenu de celui-ci et nous l'affichons
                 String str = new String(packet.getData());
                 System.out.print("Reçu de la part de " + packet.getAddress() 
                                   + " sur le port " + packet.getPort() + " : ");
                 System.out.println(str);
                 
+                udpinfo = getUDPinfo(str);
+                System.out.println(udpinfo[0] + " -- " +udpinfo[1] + " -- " + udpinfo[2]);
+                
+                if ((udpinfo[0]).equals("[1BD]")) { 
+                	//send login and ip address
+                	
+                	SendUDP.send("[UAU]:"+login.toString(), InetAddress.getByName(udpinfo[2]), 20000, false);
+                	
+
+                } else if ((udpinfo[0]).equals("[UAU]")) { 
+                	//add new user or update previous username
+                	System.out.println("[UAU]");
+                	usersDatabase.addUser(udpinfo[2], udpinfo[1]);
+                	System.out.println(usersDatabase.toString());
+                	
+				  
+                }else if ((udpinfo[0]).equals("[RAU]")){ 
+					//remove from active users 
+                	usersDatabase.removeUser(udpinfo[2], udpinfo[1]);
+			 
+                } else {
+				  		System.out.println("Error header"); 
+				  
+                }
+				 
+                
                 /**
                  * trois possibilités : 
-                 * 		1er broadcast 
-                 * 		update activeUsers
-                 * 		remove from activeUsers
+                 * 		1er broadcast [1BD]
+                 * 		update activeUsers [UAU]
+                 * 		remove from activeUsers [RAU]
                  */
                 
               //On réinitialise la taille du datagramme, pour les futures réceptions
@@ -60,7 +100,25 @@ public class ListenUsers extends Thread {
 	}
 		  
 		                
-		                
+	public String[] getUDPinfo(String packet) {
+		String header = packet.substring(0, 5);
+		String username = ""; 
+		String ipAddr = "";
+		int i;
+		for (i = 6; i < packet.length(); i++) {
+			if (packet.charAt(i) == ':') {
+				break;
+			} else {
+				username += packet.charAt(i);
+			}
+		}
+		
+		ipAddr = packet.substring(i+1);
+		
+		String[] ret = {header, username, ipAddr};
+
+		return ret;
+	}
 		                  
 	/*
 	 * //On réinitialise la taille du datagramme, pour les futures réceptions

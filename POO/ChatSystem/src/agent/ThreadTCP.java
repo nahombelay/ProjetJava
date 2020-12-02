@@ -25,7 +25,6 @@ public class ThreadTCP extends Thread{
 		      message = in.readLine();
 		      out.println("Bonjour " + message);
 
-		      //BroadcastUDP.broadcast("Hello", InetAddress.getByName("255.255.255.255"), 20000);
 		      socket.close();
 		      
 	    } catch (Exception e) {

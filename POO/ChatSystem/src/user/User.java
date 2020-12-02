@@ -5,30 +5,36 @@ import java.net.*;
 import java.util.*;
 
 import agent.*;
+import communications.SendUDP;
+import database.ActiveUsers;
 
 public class User {
 	
 	private Login login; 
+	private ActiveUsers activeUsers;
 	private InetAddress ip;
 	private String ipString; 
 
 	public User() throws UnknownHostException, IOException {
 		
+		//get IP address       
+        ip = this.getLocalAddress();
+		ipString = ip.toString().substring(1);
+		//System.out.println("IP Address : "+ ipString);
+		
+		//initialise database
+		activeUsers = new ActiveUsers();
+		
+		//Login initialisation 
+		login = new Login("User/" + ipString, ipString);
+		
 		//lancer thread ListenUsers 
-		ListenUsers lu = new ListenUsers();
+		ListenUsers lu = new ListenUsers(login, activeUsers);
 		lu.start();
 		System.out.println("[Users] Thread ListenUsers started");
 		
-		//get IP address       
-        ip = this.getLocalAddress();
-		ipString = ip.toString();
-		//System.out.println("IP Address : "+ ipString);
 		
-		//Login initialisation 
-		login = new Login("User:" + ipString);
-		
-		
-		BroadcastUDP.broadcast(login.getLogin(), InetAddress.getByName("255.255.255.255"), 20000);
+		SendUDP.send("[1BD]:" + login.toString(), InetAddress.getByName("255.255.255.255"), 20000, true);
 	
 		
 		/** dans un thread lancer ça
@@ -38,6 +44,17 @@ public class User {
 		 */
 	}
 	
+	public boolean changeUsername(String username) throws UnknownHostException, IOException {
+		//verify that username is not taken
+		boolean changed = false;
+		if (!(activeUsers.hasValue(username))){
+			login.setLogin(username);
+			SendUDP.send("[UAU]:"+login.toString(), InetAddress.getByName("255.255.255.255"), 20000, true);
+			changed = true;
+		} 
+		
+		return changed;
+	}
 	
 	/**
 	 * Return the local address of the current user
