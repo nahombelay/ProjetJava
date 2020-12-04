@@ -14,34 +14,63 @@ public class User {
 	private ActiveUsers activeUsers;
 	private InetAddress ip;
 	private String ipString; 
+	private ServerSocket mainSocket;
 
-	public User() throws UnknownHostException, IOException {
-		
+	public User() {
+	
+		this.settingIPInfo();
+		this.initialisation();
+		this.threadUDP();
+		this.threadTCP();
+	
+	}
+	
+	/**
+	 * Getting related info about user's IP @
+	 */
+	private void settingIPInfo() {
 		//get IP address       
-        ip = this.getLocalAddress();
-		ipString = ip.toString().substring(1);
+        this.ip = this.getLocalAddress();
+        this.ipString = ip.toString().substring(1);
 		//System.out.println("IP Address : "+ ipString);
-		
-		//initialise database
-		activeUsers = new ActiveUsers();
-		
-		//Login initialisation 
-		login = new Login("User/" + ipString, ipString);
-		
+	}
+	
+	/**
+	 * Initialise activeUsers hashtable
+	 * Login initialisation with default username
+	 */
+	private void initialisation() {
+		this.activeUsers = new ActiveUsers();	
+		this.login = new Login("User/" + this.ipString, this.ipString);
+	}
+	
+	/**
+	 * Each new info about a user goes throught this thread
+	 */
+	private void threadUDP() {
 		//lancer thread ListenUsers 
 		ListenUsers lu = new ListenUsers(login, activeUsers);
 		lu.start();
 		System.out.println("[Users] Thread ListenUsers started");
 		
-		
-		SendUDP.send("[1BD]:" + login.toString(), InetAddress.getByName("255.255.255.255"), 20000, true);
-	
-		
-		/** dans un thread lancer ça
-		 * System.out.println("[User]: Establishing connectino i.e opening listening server");
-			//Establish connection 
-			ThreadServer t = new ThreadServer();
-		 */
+		try {
+			SendUDP.send("[1BD]:" + login.toString(), InetAddress.getByName("255.255.255.255"), 20000, true);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * Manage all conversation of the user
+	 */
+	private void threadTCP() {
+		MainSocket mainSock = new MainSocket();
+		this.mainSocket = mainSock.getSocketServeur();
+		ListenSocket listenSock = new ListenSocket(mainSocket);
+		listenSock.start();
 	}
 	
 	public boolean changeUsername(String username) throws UnknownHostException, IOException {
@@ -75,6 +104,7 @@ public class User {
     }
 	
 	public static void main(String[] args) throws UnknownHostException, IOException {
+		@SuppressWarnings("unused")
 		User u = new User();
 	}
 }
