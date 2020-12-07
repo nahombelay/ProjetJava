@@ -3,7 +3,7 @@ package database;
 import java.util.Hashtable;
 import java.util.Set;
 
-
+//This class will be replaces by UserDB
 public class ActiveUsers {
 	
 	/**

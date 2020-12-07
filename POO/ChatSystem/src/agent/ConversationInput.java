@@ -33,6 +33,7 @@ public class ConversationInput extends Thread {
 				if (resp == null) {
 					System.out.println("[ConversationInput] " + socketInput.toString() + " : End of Conversation.");
 					socketInput.close();
+					//TODO: cancel thread
 					break;
 				} 
 				String timestamp = Timestamp.formatDateTime();
