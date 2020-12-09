@@ -56,14 +56,21 @@ public class ListenUsers extends Thread {
                 
                 if ((udpinfo[0]).equals("[1BD]")) { 
                 	//send login and ip address
-                	
                 	SendUDP.send("[UAU]:"+login.toString(), InetAddress.getByName(udpinfo[2]), 20000, false);
+                	//activeUsers.addUser(udpinfo[2], udpinfo[1]);
                 	
 
                 } else if ((udpinfo[0]).equals("[UAU]")) { 
                 	//add new user or update previous username
-                	System.out.println("[UAU]");
+                	System.out.println("[UAU]" + udpinfo[2].equals("192.168.0.12"));
+                	if (activeUsers.hasKey(udpinfo[2])) {
+                		activeUsers.deleteUser(udpinfo[2], udpinfo[1]);
+                		//activeUsers.updateUser(udpinfo[2], udpinfo[1]);
+                		System.out.println("[UAU] Here !");
+                		System.out.println("");
+                	} 
                 	activeUsers.addUser(udpinfo[2], udpinfo[1]);
+                	
                 	activeUsers.printUsers();
                 	
 				  

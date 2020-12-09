@@ -42,6 +42,7 @@ public class User {
 	 */
 	private void initialisation() {
 		this.activeUsers = new ActiveUsersDB();	
+		activeUsers.dropUsers();
 		this.login = new Login("User/" + this.ipString, this.ipString);
 	}
 	
@@ -56,6 +57,7 @@ public class User {
 		
 		try {
 			SendUDP.send("[1BD]:" + login.toString(), InetAddress.getByName("255.255.255.255"), 20000, true);
+			System.out.println("[1BD]:" + login.toString());
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

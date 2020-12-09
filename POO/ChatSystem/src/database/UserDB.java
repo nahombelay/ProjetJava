@@ -1,5 +1,7 @@
 package database;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.sql.*;
 
 //UserDB will be used to save all the users our user has interacted with in the past but also 
@@ -12,6 +14,7 @@ public class UserDB {
 	private Statement stm = null;
 	private PreparedStatement pstm = null;
 	private ResultSet rs = null;
+	@SuppressWarnings("unused")
 	private int rowsModified = 0;
 	protected String table = "";
 	
@@ -70,7 +73,7 @@ public class UserDB {
 	}
 	
 	public void deleteUser(String ip, String username) {
-		String query = "DELETE FROM " + table + " WHERE ip = ? AND username = ?;";
+		String query = "DELETE FROM " + table + " WHERE ip = ? OR username = ?;";
 		
 		try {
 			this.pstm = c.prepareStatement(query);
@@ -103,7 +106,24 @@ public class UserDB {
 	}
 	
 	public boolean hasValue(String username) {
-		String query = "SELECT COUNT (1) FROM " + table + " WHERE username = '" + username + "';";
+		String query = "SELECT COUNT (1) FROM " + table + " WHERE username = '" + username + "' ;";
+		boolean rep = false;
+		try {
+			this.stm = c.createStatement();
+			this.rs = stm.executeQuery(query);
+			rep = rs.getString(1).equals("1");
+			stm.close();
+			rs.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return rep;
+	}
+	
+	public boolean hasKey(String ip) {
+		String query = "SELECT COUNT (1) FROM " + table + " WHERE ip = '" + ip + "' ;";
+		System.out.println(query);
 		boolean rep = false;
 		try {
 			this.stm = c.createStatement();
@@ -141,29 +161,29 @@ public class UserDB {
 		}
 	}
 	
-	/*
-	 * public static void main (String argv[]) { UserDB bd = new UserDB();
-	 * //bd.printUsers();
-	 * 
-	 * System.out.println("-----------"); bd.addUser("123.123.123.123", "toto");
-	 * bd.printUsers();
-	 * 
-	 * System.out.println("-----------"); System.out.println(bd.hasValue("toti"));
-	 * 
-	 * 
-	 * System.out.println("-----------");
-	 * 
-	 * bd.updateUser("123.123.123.123", "titi");
-	 * 
-	 * bd.printUsers(); System.out.println("-----------");
-	 * 
-	 * bd.deleteUser("123.123.123.123", "titi"); bd.printUsers();
-	 * 
-	 * bd.dropUsers();
-	 * 
-	 * bd.closeConnection();
-	 * 
-	 * }
-	 */
+	
+	  public static void main (String argv[]) { UserDB bd = new UserDB();
+	  //bd.printUsers();
+	  
+	  System.out.println("-----------"); bd.addUser("123.123.123.123", "toto");
+	  bd.printUsers();
+	  
+	  System.out.println("-----------"); System.out.println(bd.hasKey("123.123.123.123"));
+	  
+	  
+	  System.out.println("-----------");
+	  
+	  bd.updateUser("123.123.123.123", "titi");
+	  
+	  bd.printUsers(); System.out.println("-----------");
+	  
+	  bd.deleteUser("123.123.123.123", "titi"); bd.printUsers();
+	  
+	  bd.dropUsers();
+	  
+	  bd.closeConnection();
+	  
+	  }
+	 
 
 }
