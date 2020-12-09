@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.*;
 
 import communications.SendUDP;
-import database.ActiveUsers;
+import database.ActiveUsersDB;
 import user.Login;
 
 public class ListenUsers extends Thread {
@@ -12,16 +12,17 @@ public class ListenUsers extends Thread {
 	final static int port = 20000; 
 	private DatagramSocket server;
 	private Login login;
-	private ActiveUsers usersDatabase;
+	private ActiveUsersDB activeUsers;
 
-	public ListenUsers(Login login, ActiveUsers usersDatabase)  {
+	public ListenUsers(Login login, ActiveUsersDB activeUsers)  {
 		this.login = login;
-		this.usersDatabase = usersDatabase;
+		this.activeUsers = activeUsers;
 		try {
 			this.server = new DatagramSocket(port);
 		} catch (SocketException e) {
             e.printStackTrace();
         }
+		
 	}
 	
 	public void run() {
@@ -62,13 +63,13 @@ public class ListenUsers extends Thread {
                 } else if ((udpinfo[0]).equals("[UAU]")) { 
                 	//add new user or update previous username
                 	System.out.println("[UAU]");
-                	usersDatabase.addUser(udpinfo[2], udpinfo[1]);
-                	System.out.println(usersDatabase.toString());
+                	activeUsers.addUser(udpinfo[2], udpinfo[1]);
+                	activeUsers.printUsers();
                 	
 				  
                 }else if ((udpinfo[0]).equals("[RAU]")){ 
 					//remove from active users 
-                	usersDatabase.removeUser(udpinfo[2], udpinfo[1]);
+                	activeUsers.deleteUser(udpinfo[2], udpinfo[1]);
 			 
                 } else {
 				  		System.out.println("Error header"); 

@@ -8,11 +8,12 @@ import java.sql.*;
 
 public class UserDB {
 	
-	Connection c = null;
-	Statement stm = null;
-	PreparedStatement pstm = null;
-	ResultSet rs = null;
-	int rowsModified = 0;
+	private Connection c = null;
+	private Statement stm = null;
+	private PreparedStatement pstm = null;
+	private ResultSet rs = null;
+	private int rowsModified = 0;
+	protected String table = "";
 	
 	public UserDB() {
 		
@@ -20,18 +21,19 @@ public class UserDB {
 		try {
 			Class.forName("org.sqlite.JDBC");
 			c = DriverManager.getConnection(url);
-			System.out.println("[UserDB] Connection OK");
+			System.out.println("[" + this.getClass().toString() + "] Connection OK");
 
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		table = "Users";
 	}
 	
-	public void printUsers () {
+	public void printUsers() {
 		try {
 			this.stm = c.createStatement();
-			this.rs = stm.executeQuery("SELECT * FROM Users");
+			this.rs = stm.executeQuery("SELECT * FROM " + table + ";");
 			
 			while (rs.next()) {
 				String ip = rs.getString(1);
@@ -52,7 +54,7 @@ public class UserDB {
 	}
 	
 	public void addUser(String ip, String username) {
-		String query = "INSERT INTO Users (ip, username) VALUES (?,?);";
+		String query = "INSERT INTO " + table + " (ip, username) VALUES (?,?);";
 		
 		try {
 			this.pstm = c.prepareStatement(query);
@@ -68,7 +70,7 @@ public class UserDB {
 	}
 	
 	public void deleteUser(String ip, String username) {
-		String query = "DELETE FROM Users WHERE ip = ? AND username = ?;";
+		String query = "DELETE FROM " + table + " WHERE ip = ? AND username = ?;";
 		
 		try {
 			this.pstm = c.prepareStatement(query);
@@ -84,7 +86,7 @@ public class UserDB {
 	}
 	
 	public void updateUser(String ip, String username) {
-		String query = "UPDATE Users SET username = ? WHERE ip = ?;";
+		String query = "UPDATE " + table + " SET username = ? WHERE ip = ?;";
 		
 		try {
 			this.pstm = c.prepareStatement(query);
@@ -100,10 +102,26 @@ public class UserDB {
 		}
 	}
 	
+	public boolean hasValue(String username) {
+		String query = "SELECT COUNT (1) FROM " + table + " WHERE username = '" + username + "';";
+		boolean rep = false;
+		try {
+			this.stm = c.createStatement();
+			this.rs = stm.executeQuery(query);
+			rep = rs.getString(1).equals("1");
+			stm.close();
+			rs.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return rep;
+	}
+	
 	public void dropUsers() {
 		try {
 			this.stm = c.createStatement();
-			this.rowsModified = stm.executeUpdate("DELETE FROM Users;");
+			this.rowsModified = stm.executeUpdate("DELETE FROM " + table + ";");
 
 			stm.close();
 			
@@ -123,28 +141,29 @@ public class UserDB {
 		}
 	}
 	
-	public static void main (String argv[]) {
-		UserDB bd = new UserDB();
-		//bd.printUsers();
-		
-		System.out.println("-----------");
-		bd.addUser("123.123.123.123", "toto");
-		bd.printUsers();
-		
-		System.out.println("-----------");
-		
-		bd.updateUser("123.123.123.123", "titi");
-		
-		bd.printUsers();
-		System.out.println("-----------");
-		
-		bd.deleteUser("123.123.123.123", "titi");
-		bd.printUsers();
-		
-		bd.dropUsers();
-		
-		bd.closeConnection();
-		
-	}
+	/*
+	 * public static void main (String argv[]) { UserDB bd = new UserDB();
+	 * //bd.printUsers();
+	 * 
+	 * System.out.println("-----------"); bd.addUser("123.123.123.123", "toto");
+	 * bd.printUsers();
+	 * 
+	 * System.out.println("-----------"); System.out.println(bd.hasValue("toti"));
+	 * 
+	 * 
+	 * System.out.println("-----------");
+	 * 
+	 * bd.updateUser("123.123.123.123", "titi");
+	 * 
+	 * bd.printUsers(); System.out.println("-----------");
+	 * 
+	 * bd.deleteUser("123.123.123.123", "titi"); bd.printUsers();
+	 * 
+	 * bd.dropUsers();
+	 * 
+	 * bd.closeConnection();
+	 * 
+	 * }
+	 */
 
 }

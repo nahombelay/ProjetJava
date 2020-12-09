@@ -7,11 +7,12 @@ import java.util.*;
 import agent.*;
 import communications.SendUDP;
 import database.ActiveUsers;
+import database.ActiveUsersDB;
 
 public class User {
 	
 	private Login login; 
-	private ActiveUsers activeUsers;
+	private ActiveUsersDB activeUsers;
 	private InetAddress ip;
 	private String ipString; 
 	private ServerSocket mainSocket;
@@ -40,7 +41,7 @@ public class User {
 	 * Login initialisation with default username
 	 */
 	private void initialisation() {
-		this.activeUsers = new ActiveUsers();	
+		this.activeUsers = new ActiveUsersDB();	
 		this.login = new Login("User/" + this.ipString, this.ipString);
 	}
 	
