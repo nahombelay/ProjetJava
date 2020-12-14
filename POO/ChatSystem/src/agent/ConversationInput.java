@@ -3,6 +3,7 @@ package agent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import database.MessagesDB;
@@ -21,7 +22,7 @@ public class ConversationInput extends Thread {
 	public ConversationInput(Socket socketInput, MessagesDB messagesDB) {
 		this.messagesDB = messagesDB;
 		this.socketInput = socketInput;
-		ipDest = socketInput.getRemoteSocketAddress().toString().substring(1);
+		ipDest = ((InetSocketAddress) socketInput.getRemoteSocketAddress()).toString().split("/")[1].split(":")[0];
 	}
 	/**
 	 * At each input read, it prints it. 

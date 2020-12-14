@@ -1,6 +1,7 @@
 package agent;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -30,7 +31,7 @@ public class ConversationOutput extends Thread {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		ipDest = socketOutput.getRemoteSocketAddress().toString().substring(1);
+		ipDest = ((InetSocketAddress) socketOutput.getRemoteSocketAddress()).toString().split("/")[1].split(":")[0];
 		this.scan = new Scanner(System.in);
 	}
 	/**
