@@ -122,7 +122,8 @@ public class UserDB {
 	}
 	
 	public boolean hasKey(String ip) {
-		String query = "SELECT COUNT (1) FROM " + table + " WHERE ip = '" + ip + "' ;";
+		//String query = "SELECT COUNT (1) FROM " + table + " WHERE ip = '" + ip + "' ;";
+		String query = "SELECT COUNT (1) FROM " + table + " WHERE ip = '" + ip.substring(0,12) + "';";
 		System.out.println(query);
 		boolean rep = false;
 		try {
@@ -135,6 +136,31 @@ public class UserDB {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return rep;
+	}
+	
+	
+	
+	public boolean hasKey1(String ip) {
+		String ipOrig = null;
+		String query = "SELECT COUNT (ip) FROM " + table + " WHERE ip = ?;";
+		ipOrig = ip.substring(0,12);
+		System.out.println("[hasKey] " + ipOrig.equals("192.168.0.12"));
+		boolean rep = false;
+		//this.addUser(ip, "hello");
+		try {
+			this.pstm = c.prepareStatement(query);
+			this.pstm.setString(1, ip);
+			this.rs = pstm.executeQuery();
+			System.out.println("[hasKey] " + rs.getString(1));
+			rep = rs.getString(1).equals("1");
+			this.pstm.close();
+			rs.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("[hasKey] " + rep);
 		return rep;
 	}
 	
@@ -162,28 +188,31 @@ public class UserDB {
 	}
 	
 	
-	  public static void main (String argv[]) { UserDB bd = new UserDB();
-	  //bd.printUsers();
-	  
-	  System.out.println("-----------"); bd.addUser("123.123.123.123", "toto");
-	  bd.printUsers();
-	  
-	  System.out.println("-----------"); System.out.println(bd.hasKey("123.123.123.123"));
-	  
-	  
-	  System.out.println("-----------");
-	  
-	  bd.updateUser("123.123.123.123", "titi");
-	  
-	  bd.printUsers(); System.out.println("-----------");
-	  
-	  bd.deleteUser("123.123.123.123", "titi"); bd.printUsers();
-	  
-	  bd.dropUsers();
-	  
-	  bd.closeConnection();
-	  
-	  }
+	/*
+	 * public static void main (String argv[]) { UserDB bd = new UserDB();
+	 * //bd.printUsers();
+	 * 
+	 * System.out.println("-----------"); bd.addUser("123.123.123.123", "toto");
+	 * bd.printUsers();
+	 * 
+	 * System.out.println("-----------");
+	 * System.out.println(bd.hasKey("123.123.123.123"));
+	 * 
+	 * 
+	 * System.out.println("-----------");
+	 * 
+	 * bd.updateUser("123.123.123.123", "titi");
+	 * 
+	 * bd.printUsers(); System.out.println("-----------");
+	 * 
+	 * bd.deleteUser("123.123.123.123", "titi"); bd.printUsers();
+	 * 
+	 * bd.dropUsers();
+	 * 
+	 * bd.closeConnection();
+	 * 
+	 * }
+	 */
 	 
 
 }
