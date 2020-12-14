@@ -140,30 +140,6 @@ public class UserDB {
 	}
 	
 	
-	
-	public boolean hasKey1(String ip) {
-		String ipOrig = null;
-		String query = "SELECT COUNT (ip) FROM " + table + " WHERE ip = ?;";
-		ipOrig = ip.substring(0,12);
-		System.out.println("[hasKey] " + ipOrig.equals("192.168.0.12"));
-		boolean rep = false;
-		//this.addUser(ip, "hello");
-		try {
-			this.pstm = c.prepareStatement(query);
-			this.pstm.setString(1, ip);
-			this.rs = pstm.executeQuery();
-			System.out.println("[hasKey] " + rs.getString(1));
-			rep = rs.getString(1).equals("1");
-			this.pstm.close();
-			rs.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("[hasKey] " + rep);
-		return rep;
-	}
-	
 	public void dropUsers() {
 		try {
 			this.stm = c.createStatement();
