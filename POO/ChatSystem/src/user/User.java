@@ -8,6 +8,7 @@ import agent.*;
 import communications.SendUDP;
 import database.ActiveUsers;
 import database.ActiveUsersDB;
+import database.MessagesDB;
 
 public class User {
 	
@@ -16,6 +17,7 @@ public class User {
 	private InetAddress ip;
 	private String ipString; 
 	private ServerSocket mainSocket;
+	private MessagesDB messageDB;
 
 	public User() {
 	
@@ -42,6 +44,7 @@ public class User {
 	 */
 	private void initialisation() {
 		this.activeUsers = new ActiveUsersDB();	
+		this.messageDB = new MessagesDB();
 		activeUsers.dropUsers();
 		this.login = new Login("User/" + this.ipString, this.ipString);
 	}
@@ -72,7 +75,7 @@ public class User {
 	private void threadTCP() {
 		MainSocket mainSock = new MainSocket();
 		this.mainSocket = mainSock.getSocketServeur();
-		ListenSocket listenSock = new ListenSocket(mainSocket);
+		ListenSocket listenSock = new ListenSocket(mainSocket, messageDB);
 		listenSock.start();
 	}
 	

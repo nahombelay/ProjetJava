@@ -5,19 +5,23 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
+import database.MessagesDB;
 import messages.Timestamp;
 
 public class ConversationInput extends Thread {
 	
 	private Socket socketInput;
 	private static BufferedReader inputBuffer;
-	
+	private MessagesDB messagesDB;
+	private final String ipDest; 
     /**
      * 
      * @param socketInput : socket to which we'll be permanently waiting for an input
      */
-	public ConversationInput(Socket socketInput) {
+	public ConversationInput(Socket socketInput, MessagesDB messagesDB) {
+		this.messagesDB = messagesDB;
 		this.socketInput = socketInput;
+		ipDest = socketInput.getRemoteSocketAddress().toString().substring(1);
 	}
 	/**
 	 * At each input read, it prints it. 
@@ -38,7 +42,7 @@ public class ConversationInput extends Thread {
 				} 
 				String timestamp = Timestamp.formatDateTime();
 				System.out.println("[ConversationInput] " + socketInput.toString() + " --- " + timestamp + " : " + resp);
-				
+				messagesDB.addMessage(ipDest, false, resp);
 				//stocker le message dans la base de donnée
 				
 				

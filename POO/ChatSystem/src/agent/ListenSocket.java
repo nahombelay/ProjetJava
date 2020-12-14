@@ -4,17 +4,21 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import database.MessagesDB;
+
 public class ListenSocket extends Thread {
 	
 	private ServerSocket serverSocket;
 	private Socket socketConversation;
+	private MessagesDB messagesDB;
 
     /**
      * 
      * @param socket : take Server socket from mainSocket
      */
-	public ListenSocket(ServerSocket socket) {
+	public ListenSocket(ServerSocket socket, MessagesDB messagesDB) {
 		this.serverSocket = socket;
+		this.messagesDB = messagesDB;
 	}
 	
 	/**
@@ -30,8 +34,8 @@ public class ListenSocket extends Thread {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			ConversationInput ci = new ConversationInput(socketConversation);
-			ConversationOutput co = new ConversationOutput(socketConversation);
+			ConversationInput ci = new ConversationInput(socketConversation, messagesDB);
+			ConversationOutput co = new ConversationOutput(socketConversation, messagesDB);
 	        ci.start();
 	        co.start();
 	      }
