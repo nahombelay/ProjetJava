@@ -1,7 +1,5 @@
 package database;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.sql.*;
 
 //UserDB will be used to save all the users our user has interacted with in the past but also 
@@ -123,7 +121,7 @@ public class UserDB {
 	
 	public boolean hasKey(String ip) {
 		//String query = "SELECT COUNT (1) FROM " + table + " WHERE ip = '" + ip + "' ;";
-		String query = "SELECT COUNT (1) FROM " + table + " WHERE ip = '" + ip.substring(0,12) + "';";
+		String query = "SELECT COUNT (1) FROM " + table + " WHERE ip = '" + ip + "';";
 		System.out.println(query);
 		boolean rep = false;
 		try {

@@ -6,7 +6,6 @@ import java.util.*;
 
 import agent.*;
 import communications.SendUDP;
-import database.ActiveUsers;
 import database.ActiveUsersDB;
 import database.MessagesDB;
 
