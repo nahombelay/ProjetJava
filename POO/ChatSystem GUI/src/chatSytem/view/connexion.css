@@ -3,5 +3,11 @@
 } 
 
 .button {
-	background-color: #4CAF50;
+	-fx-background-color: green;
+	
+}
+
+.label {
+	-fx-font-family: Arial;
+	-fx-font-size: 15px;
 }
