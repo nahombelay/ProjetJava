@@ -35,7 +35,7 @@
                         <Insets right="50.0" top="30.0" />
                      </GridPane.margin>
                   </Label>
-                  <TextField maxWidth="150.0" prefHeight="27.0" prefWidth="150.0" promptText="Enter Username..." GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                  <TextField fx:id="usernameField" maxWidth="150.0" prefHeight="27.0" prefWidth="150.0" promptText="Enter Username..." GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
                      <GridPane.margin>
                         <Insets bottom="20.0" top="30.0" />
                      </GridPane.margin>
@@ -45,10 +45,10 @@
                         <Insets right="75.0" />
                      </GridPane.margin>
                      <toggleGroup>
-                        <ToggleGroup fx:id="Place" />
+                        <ToggleGroup fx:id="Location" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="Extern" toggleGroup="$Place" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                  <RadioButton mnemonicParsing="false" text="Extern" toggleGroup="$Location" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
                      <GridPane.margin>
                         <Insets left="75.0" />
                      </GridPane.margin>
@@ -61,7 +61,7 @@
                         <Insets />
                      </GridPane.margin>
                   </ChoiceBox>
-                  <Button contentDisplay="CENTER" mnemonicParsing="false" text="Connect" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER">
+                  <Button contentDisplay="CENTER" mnemonicParsing="false" onAction="#connection" text="Connect" GridPane.halignment="CENTER" GridPane.rowIndex="5" GridPane.valignment="CENTER">
                      <padding>
                         <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
                      </padding>
