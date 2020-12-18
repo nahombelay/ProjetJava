@@ -46,6 +46,7 @@ public class Main extends Application {
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(Main.class.getResource("./view/ChatPane.fxml"));
 		chatLayout = loader.load();
+		connexionLayout.setVisible(false);
 		MainLayout.setCenter(chatLayout);
 	}
 

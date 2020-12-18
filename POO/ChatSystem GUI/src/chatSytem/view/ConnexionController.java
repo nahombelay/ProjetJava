@@ -7,9 +7,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import src.user.User;
 
 public class ConnexionController {
 	
@@ -24,6 +26,11 @@ public class ConnexionController {
 	@FXML
 	private ToggleGroup Location;
 	
+	@FXML
+	private Label userTaken;
+	
+	private User user;
+	
 	
 	
 	@FXML
@@ -34,32 +41,44 @@ public class ConnexionController {
 	
 	@FXML
 	private void connection() throws IOException {
+		
+		userTaken.setVisible(false);
+		
+		//Get username
+		String username = usernameField.getText();
 	
 		//Get the selected radio button
 		RadioButton selectedRadioButton = (RadioButton) Location.getSelectedToggle();
 		String toogleGroupValue = selectedRadioButton.getText();
 	
-		//TODO: Launch the right method whether the user is intern or not
 		if (toogleGroupValue == "Intern") {
 			//On lance un nouvel user ? 
 			System.out.println(toogleGroupValue);
+			user = new User();
+			//TODO: Check if it's unique --> we shoudn't continue if the username is not unique 
+			System.out.println(username);
+			if (user.changeUsername(username)) {
+				
+				System.out.println("[Connexion Controller] Username changed to : " + username);
+				//Get the status
+				String status = choiceBox.getSelectionModel().getSelectedItem();
+				//Send Status to the servlet
+				System.out.println(status);
+				//Last part before displaying the chat screen
+				Main.showChatLayout();
+				//TODO: Traitement supplémentaire ? 
+				
+			} else {
+				userTaken.setVisible(true);
+				usernameField.setText("");
+				
+			}
+			
 		} else {
-			//On lance la version avec servlet
+			//TODO: On lance la version avec servlet
 			System.out.println(toogleGroupValue);
 		}
-		//Get username
-		String username = usernameField.getText();
-		//TODO: Check if it's unique --> we shoudn't continue if the username is not unique 
-		System.out.println(username);
-		
-		//Get the status
-		String status = choiceBox.getSelectionModel().getSelectedItem();
-		//Send Status to the servlet
-		System.out.println(status);
-		//Last part before displaying the chat screen
-		Main.showChatLayout();
-		//TODO: Display the chat screen (once created…)
-		
+
 	}
 
 }
