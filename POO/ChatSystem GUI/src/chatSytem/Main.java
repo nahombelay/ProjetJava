@@ -14,6 +14,7 @@ public class Main extends Application {
 	private Stage primaryStage;
 	private static BorderPane MainLayout;
 	private static BorderPane connexionLayout;
+	private static BorderPane chatLayout;
 
 	@Override
 	public void start(Stage primaryStage) throws IOException {
@@ -40,13 +41,14 @@ public class Main extends Application {
 		MainLayout.setCenter(connexionLayout);
 		connexionLayout.setPadding(new Insets(250, 475, 250, 475));
 	}
-	//Ne fonctionne pas pour l'instant
-	private static void setBigLayout() {
-		MainLayout.setPrefWidth(1200);
-		MainLayout.setPrefHeight(800);
-		MainLayout.setMinWidth(1200);
-		MainLayout.setMinHeight(800);
+	
+	public static void showChatLayout() throws IOException {
+		FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(Main.class.getResource("./view/ChatPane.fxml"));
+		chatLayout = loader.load();
+		MainLayout.setCenter(chatLayout);
 	}
+
 
 	public static void main(String[] args) {
 		launch(args);

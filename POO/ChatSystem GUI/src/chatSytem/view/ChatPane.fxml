@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<BorderPane prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="Chat">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Quit" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="User">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Change Username" />
+                  <Menu mnemonicParsing="false" text="Change Status">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Online" />
+                        <MenuItem mnemonicParsing="false" text="Do Not Disturb" />
+                        <MenuItem mnemonicParsing="false" text="Offline" />
+                     </items>
+                  </Menu>
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+   <center>
+      <SplitPane dividerPositions="0.2688" maxHeight="771.5" maxWidth="1200.0" minHeight="771.5" minWidth="1200.0" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <items>
+          <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="769.5" prefWidth="318.0">
+               <children>
+                  <ScrollPane hbarPolicy="NEVER" layoutX="44.0" layoutY="161.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="769.5" prefWidth="300.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <content>
+                      <AnchorPane maxHeight="773.0" maxWidth="330.0" minHeight="773.0" minWidth="330.0" prefHeight="773.0" prefWidth="330.0">
+                           <children>
+                              <TreeTableView maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="773.0" prefWidth="300.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="26.0" AnchorPane.topAnchor="0.0">
+                                <columns>
+                                  <TreeTableColumn maxWidth="300.0" minWidth="300.0" prefWidth="300.0" text="Users" />
+                                </columns>
+                                 <columnResizePolicy>
+                                    <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                 </columnResizePolicy>
+                              </TreeTableView>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </ScrollPane>
+               </children>
+            </AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+               <children>
+                  <SplitPane dividerPositions="0.73" layoutX="248.0" layoutY="222.0" maxHeight="769.5" maxWidth="872.0" minHeight="769.5" minWidth="872.0" orientation="VERTICAL" prefHeight="769.5" prefWidth="858.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <items>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                           <children>
+                              <GridPane layoutX="211.0" layoutY="117.0" prefHeight="552.0" prefWidth="870.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints maxHeight="269.77789306640625" minHeight="10.0" prefHeight="38.533477783203125" vgrow="SOMETIMES" />
+                                  <RowConstraints maxHeight="532.3506240844727" minHeight="10.0" prefHeight="513.4665222167969" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <GridPane>
+                                      <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                      </columnConstraints>
+                                      <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                      </rowConstraints>
+                                       <children>
+                                          <Label alignment="CENTER" prefHeight="39.0" prefWidth="435.0" text="Conversation with : [User]" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                                          <Label alignment="CENTER" prefHeight="39.0" prefWidth="470.0" text="Date : [Date]" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                                          <Separator maxWidth="-Infinity" orientation="VERTICAL" prefHeight="37.0" GridPane.halignment="RIGHT" GridPane.valignment="TOP" />
+                                          <Separator prefWidth="200.0" GridPane.valignment="BOTTOM" />
+                                          <Separator prefWidth="200.0" GridPane.columnIndex="1" GridPane.valignment="BOTTOM" />
+                                       </children>
+                                    </GridPane>
+                                 </children>
+                              </GridPane>
+                           </children></AnchorPane>
+                      <AnchorPane maxHeight="207.5" maxWidth="870.0" minHeight="207.5" minWidth="870.0" prefHeight="100.0" prefWidth="160.0">
+                           <children>
+                              <GridPane layoutX="132.0" layoutY="46.0" prefHeight="201.5" prefWidth="870.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints maxHeight="163.93084716796875" minHeight="10.0" prefHeight="163.93084716796875" vgrow="SOMETIMES" />
+                                  <RowConstraints maxHeight="151.75469970703125" minHeight="10.0" prefHeight="37.56915283203125" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <ButtonBar prefHeight="27.0" prefWidth="870.0" GridPane.rowIndex="1">
+                                      <buttons>
+                                        <Button mnemonicParsing="false" text="End Conversation" />
+                                      </buttons>
+                                    </ButtonBar>
+                                    <GridPane>
+                                      <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="811.5068359375" minWidth="10.0" prefWidth="810.3447265625" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="430.35174560546875" minWidth="10.0" prefWidth="59.6552734375" />
+                                      </columnConstraints>
+                                      <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                      </rowConstraints>
+                                       <children>
+                                          <TextArea prefHeight="200.0" prefWidth="200.0" promptText="Enter Message…" />
+                                          <Button maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="45.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                                             <graphic>
+                                                <ImageView fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@img/send.png" />
+                                                   </image></ImageView>
+                                             </graphic>
+                                          </Button>
+                                       </children>
+                                    </GridPane>
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </AnchorPane>
+                    </items>
+                  </SplitPane>
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+   </center>
+</BorderPane>

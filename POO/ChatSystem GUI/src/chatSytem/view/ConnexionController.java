@@ -57,7 +57,7 @@ public class ConnexionController {
 		//Send Status to the servlet
 		System.out.println(status);
 		//Last part before displaying the chat screen
-		//Main.showMainLayout();
+		Main.showChatLayout();
 		//TODO: Display the chat screen (once created…)
 		
 	}
