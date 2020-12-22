@@ -57,7 +57,8 @@ public class ConnexionController {
 			user = new User();
 			//TODO: Check if it's unique --> we shoudn't continue if the username is not unique 
 			System.out.println(username);
-			if (user.changeUsername(username)) {
+			boolean usernameChanged = user.changeUsername(username);
+			if (usernameChanged) {
 				
 				System.out.println("[Connexion Controller] Username changed to : " + username);
 				//Get the status
@@ -78,7 +79,8 @@ public class ConnexionController {
 			//TODO: On lance la version avec servlet
 			System.out.println(toogleGroupValue);
 		}
-
+		//ligne a supprimer ensuite
+		Main.showChatLayout();
 	}
 
 }
