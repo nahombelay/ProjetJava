@@ -2,8 +2,8 @@
     -fx-background-color: linear-gradient(to bottom, #48688A, #BF9BDE);
 } 
 
-.button {
-	-fx-background-color: white;
+.button .text {
+	-fx-color: white;
 	
 }
 

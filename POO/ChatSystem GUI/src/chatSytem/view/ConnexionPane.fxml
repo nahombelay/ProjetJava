@@ -40,7 +40,7 @@
                         <Insets bottom="20.0" top="30.0" />
                      </GridPane.margin>
                   </TextField>
-                  <RadioButton mnemonicParsing="false" text="Intern" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                  <RadioButton mnemonicParsing="false" text="Intern" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
                      <GridPane.margin>
                         <Insets right="75.0" />
                      </GridPane.margin>
@@ -48,7 +48,7 @@
                         <ToggleGroup fx:id="Location" />
                      </toggleGroup>
                   </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="Extern" toggleGroup="$Location" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                  <RadioButton mnemonicParsing="false" text="Extern" toggleGroup="$Location" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
                      <GridPane.margin>
                         <Insets left="75.0" />
                      </GridPane.margin>
@@ -71,6 +71,7 @@
                         <Insets right="80.0" top="30.0" />
                      </GridPane.margin>
                   </Label>
+                  <Label fx:id="userTaken" text="Username Taken..." textFill="RED" visible="false" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="TOP" />
                </children>
             </GridPane>
          </children>
