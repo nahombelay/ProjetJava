@@ -124,6 +124,11 @@ public class User {
         return null;
     }
 	
+	public void close() {
+		ListenUsers.stop = true;
+		ListenSocket.stop = true;
+	}
+	
 	public static void main(String[] args) throws UnknownHostException, IOException {
 		@SuppressWarnings("unused")
 		User u = new User();

@@ -28,7 +28,7 @@ public class Main extends Application {
 		showMainLayout();
 		showConnexionLayout();
 	}
-
+	
 
 	public void showMainLayout() throws IOException {
 		FXMLLoader loader = new FXMLLoader();
@@ -75,4 +75,5 @@ public class Main extends Application {
 	public static void main(String[] args) {
 		launch(args);
 	}
+
 }

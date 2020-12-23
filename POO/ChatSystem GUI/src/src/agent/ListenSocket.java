@@ -11,6 +11,7 @@ public class ListenSocket extends Thread {
 	private ServerSocket serverSocket;
 	private Socket socketConversation;
 	private MessagesDB messagesDB;
+	public static boolean stop = false;
 
     /**
      * 
@@ -26,7 +27,7 @@ public class ListenSocket extends Thread {
 	 */
 	public void run() {
 		System.out.println("[ListenSocket] Attente bind...");
-		while (true) {
+		while (!stop) {
 			try {
 				socketConversation = serverSocket.accept();
 				System.out.println("[ListenSocket] New accept, socket " + socketConversation.toString());
@@ -39,6 +40,9 @@ public class ListenSocket extends Thread {
 	        ci.start();
 	        co.start();
 	      }
+		ConversationInput.stop = true;
+		ConversationOutput.stop = true;
+		System.out.println("[ListenSocket] End of Thread");
 		
 	}
 

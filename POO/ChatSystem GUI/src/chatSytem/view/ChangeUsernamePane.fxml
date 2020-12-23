@@ -22,6 +22,11 @@
                   <Font name="Arial Bold" size="13.0" />
                </font>
             </Button>
+            <Label fx:id="userTaken" layoutX="127.0" layoutY="121.0" text="Username is taken…" textFill="RED" translateX="-100.0" translateY="-5.0" visible="false">
+               <font>
+                  <Font name="Arial Bold" size="13.0" />
+               </font>
+            </Label>
          </children>
       </AnchorPane>
    </center>

@@ -1,7 +1,5 @@
 package chatSytem.view;
 
-import java.io.IOException;
-
 import chatSytem.Main;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,11 +9,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import src.database.ActiveUsersDB;
 import src.user.User;
 
 public class ConnexionController {
 	
-	ObservableList<String> choices = FXCollections.observableArrayList("Online","Do not disturb","Offline");
+	ObservableList<String> choices = FXCollections.observableArrayList("Online","Do Not Disturb","Offline");
 	
 	@FXML
 	private ChoiceBox<String> choiceBox;
@@ -29,7 +28,9 @@ public class ConnexionController {
 	@FXML
 	private Label userTaken;
 	
-	//private User user;
+	private ActiveUsersDB activeUsers;
+	
+	protected static String toogleGroupValue;
 	
 	
 	
@@ -40,7 +41,7 @@ public class ConnexionController {
 	}
 	
 	@FXML
-	private void connection() throws IOException {
+	private void connection() throws Exception {
 		
 		userTaken.setVisible(false);
 		
@@ -49,25 +50,24 @@ public class ConnexionController {
 	
 		//Get the selected radio button
 		RadioButton selectedRadioButton = (RadioButton) Location.getSelectedToggle();
-		String toogleGroupValue = selectedRadioButton.getText();
+		toogleGroupValue = selectedRadioButton.getText();
 	
 		if (toogleGroupValue.equals("Intern")) {
 			//On lance un nouvel user ? 
 			System.out.println(toogleGroupValue);
 			Main.user = new User();
-			//TODO: Check if it's unique --> we shoudn't continue if the username is not unique 
+			activeUsers = Main.user.getActiveUsers();
+			//Check if it's unique --> we shoudn't continue if the username is not unique 
 			System.out.println(username);
 			boolean usernameChanged = Main.user.changeUsername(username);
 			if (usernameChanged) {
-				
 				System.out.println("[Connexion Controller] Username changed to : " + username);
 				//Get the status
 				String status = choiceBox.getSelectionModel().getSelectedItem();
-				//Send Status to the servlet
+				activeUsers.changeStatus(username, status);
 				System.out.println(status);
 				//Last part before displaying the chat screen
 				Main.showChatLayout();
-				//TODO: Traitement supplémentaire ? 
 				
 			} else {
 				userTaken.setVisible(true);
@@ -79,8 +79,8 @@ public class ConnexionController {
 			//TODO: On lance la version avec servlet
 			System.out.println(toogleGroupValue);
 		}
-		//ligne a supprimer ensuite
-		//Main.showChatLayout();
+
 	}
+
 
 }

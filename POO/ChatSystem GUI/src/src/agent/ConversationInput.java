@@ -15,6 +15,7 @@ public class ConversationInput extends Thread {
 	private static BufferedReader inputBuffer;
 	private MessagesDB messagesDB;
 	private final String ipDest; 
+	public static boolean stop = false;
     /**
      * 
      * @param socketInput : socket to which we'll be permanently waiting for an input
@@ -31,7 +32,7 @@ public class ConversationInput extends Thread {
 	 */
 	public void run()  {
 		
-		while(true) {
+		while(!stop) {
 			try {
 				inputBuffer = new BufferedReader(new InputStreamReader(socketInput.getInputStream()));
 				String resp = inputBuffer.readLine();
@@ -53,6 +54,7 @@ public class ConversationInput extends Thread {
 			}
 			
 		}
+		System.out.println("[ConversationInput] End of Thread");
 		
 	}
 	public Socket getSocketInput() {

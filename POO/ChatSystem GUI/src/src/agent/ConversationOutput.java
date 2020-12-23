@@ -16,6 +16,7 @@ public class ConversationOutput extends Thread {
 	private Socket socketOutput;
 	private MessagesDB messagesDB;
 	private final String ipDest;
+	public static boolean stop = false;
 
 	/**
 	 * Constructor 
@@ -43,7 +44,7 @@ public class ConversationOutput extends Thread {
 		
 		String msg = null;
 		System.out.println("[ConversationOutput] You can now enter a message...");
-		while(true) {
+		while(!stop) {
 			msg = scan.nextLine();
 			stcp.sendTextTCP("[ConversationOutput] " + msg);
 			
@@ -51,6 +52,7 @@ public class ConversationOutput extends Thread {
 			messagesDB.addMessage(ipDest, true, msg);
 			//stocker le message dans la base de donnée avec timestamp
 		}
+		System.out.println("[ConversationOutput] End of Thread");
 	
 		
 	}

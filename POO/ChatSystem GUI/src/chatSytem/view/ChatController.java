@@ -1,11 +1,20 @@
 package chatSytem.view;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 import chatSytem.Main;
+import javafx.application.Platform;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.stage.Stage;
+import src.database.ActiveUsersDB;
+import src.user.Login;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
@@ -17,7 +26,10 @@ import javafx.scene.control.TextArea;
 
 public class ChatController {
 	
-	//To set as invisble when it starts end visble when we are in a conversation
+	private ActiveUsersDB activeUsers;
+	
+	private Login login;
+	
 	@FXML
 	private Button endConvoButton;
 	
@@ -37,7 +49,7 @@ public class ChatController {
 	private Label dateLabel;
 	
 	@FXML
-	private TableView tableView;
+	private TableView<Button> tableView;
 	
 	@FXML
 	private TableColumn tableViewColumn;
@@ -96,21 +108,48 @@ public class ChatController {
 	}
 	
 	@FXML
-	public void switchToOnline() {
+	public void switchToOnline() throws Exception {
 		System.out.println("Online");
-		//changer le statut a online avec le servlet
+		String location = ConnexionController.toogleGroupValue;
+		if (location.equals("Intern")) {
+			activeUsers = Main.user.getActiveUsers();
+			login = Main.user.getLogin();
+			activeUsers.changeStatus(login.getLogin(), "Online");
+		} else if (location.equals("Extern")) {
+			//TODO: Complete once servlet done
+		} else {
+			throw new Exception("Unable to change Status");
+		}
 	}
 	
 	@FXML
-	public void switchToDND() {
+	public void switchToDND() throws Exception {
 		System.out.println("Do Not Disturb");
-		//changer le statut a online avec le servlet
+		String location = ConnexionController.toogleGroupValue;
+		if (location.equals("Intern")) {
+			activeUsers = Main.user.getActiveUsers();
+			login = Main.user.getLogin();
+			activeUsers.changeStatus(login.getLogin(), "Do Not Disturb");
+		} else if (location.equals("Extern")) {
+			//TODO: Complete once servlet done
+		} else {
+			throw new Exception("Unable to change Status");
+		}
 	}
 	
 	@FXML
-	public void switchToOffline() {
+	public void switchToOffline() throws Exception {
 		System.out.println("Offline");
-		//changer le statut a online avec le servlet
+		String location = ConnexionController.toogleGroupValue;
+		if (location.equals("Intern")) {
+			activeUsers = Main.user.getActiveUsers();
+			login = Main.user.getLogin();
+			activeUsers.changeStatus(login.getLogin(), "Offline");
+		} else if (location.equals("Extern")) {
+			//TODO: Complete once servlet done
+		} else {
+			throw new Exception("Unable to change Status");
+		}
 	}
 	
 	@FXML
@@ -118,6 +157,39 @@ public class ChatController {
 		Main.showChangeUsernameLayout();
 	}
 	
+	
+	//TODO : rajouter observeur
+	@FXML
+	public void updateTable() throws ClassNotFoundException, SQLException {
+		activeUsers = Main.user.getActiveUsers();
+		ArrayList<Login> list = activeUsers.getAllUsers();
+		
+		for(Login l : list) {
+			Button btn = new Button(); 
+			btn.setMinWidth(328);
+            btn.setMinHeight(50);
+            btn.setText(l.getLogin());  
+            btn.setOnAction(new EventHandler<ActionEvent>() {
+                @Override 
+                public void handle(ActionEvent event) {
+                    System.out.println(btn.getText()); //Or "1" as in your code
+                }
+            });
+            tableView.getItems().add(btn);
+		}
+		
+	}
+	
+	//NE marche pas encore : regarder https://stackoverflow.com/questions/12153622/how-to-close-a-javafx-application-on-window-close 
+	@FXML
+	public void quitHandler() {
+		//TODO : il faut arreter le reste aussi je suppose pas que faire ca 
+		Main.user.close();
+		Platform.exit();
+		//Main.closeStage();
+	}
+	
 	//ouvrir la connenxion new Socket(ip, port);
+	//Rajouter une methode close dans user ?
 
 }

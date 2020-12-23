@@ -26,7 +26,7 @@
         <menus>
           <Menu mnemonicParsing="false" text="Chat">
             <items>
-              <MenuItem fx:id="quitItem" mnemonicParsing="false" text="Quit" />
+              <MenuItem fx:id="quitItem" mnemonicParsing="false" onAction="#quitHandler" text="Quit" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="User">
@@ -141,7 +141,7 @@
                                       </rowConstraints>
                                        <children>
                                           <TextArea fx:id="textArea" prefHeight="200.0" prefWidth="200.0" promptText="Enter Message…" />
-                                          <Button fx:id="sendButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="45.0" style="-fx-border-width: 0; -fx-border-color: none;" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                                          <Button fx:id="sendButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#updateTable" prefHeight="45.0" prefWidth="45.0" style="-fx-border-width: 0; -fx-border-color: none;" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                                              <graphic>
                                                 <ImageView fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>
