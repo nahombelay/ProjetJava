@@ -1,6 +1,9 @@
 package src.database;
 
 import java.sql.*;
+import java.util.ArrayList;
+
+import src.user.Login;
 
 //UserDB will be used to save all the users our user has interacted with in the past but also 
 //keep track of all active users
@@ -52,6 +55,24 @@ public class UserDB {
 		}
 		
 		
+	}
+	
+	public void changeStatus(String username, String status) throws Exception {
+		if (status.equals("Online") || status.equals("Do Not Disturb") || status.equals("Offline")) {
+			String query = "UPDATE " + table + " SET status = ? WHERE username = ?;";
+			try {
+				this.pstm = c.prepareStatement(query);
+				this.pstm.setString(1, status);
+				this.pstm.setString(2, username);
+				this.rowsModified = pstm.executeUpdate();
+				this.pstm.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			throw new Exception("Wrong Status");
+		}
 	}
 	
 	public void addUser(String ip, String username) {
@@ -150,6 +171,56 @@ public class UserDB {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public ArrayList<Login> getAllUsers() throws ClassNotFoundException, SQLException {
+	    this.stm = c.createStatement();
+	    String sql = "Select * From " + table;
+	    this.rs = stm.executeQuery(sql);
+	    ArrayList<Login> allUsers = new ArrayList<>();
+	    while (rs.next()) {
+	        Login login = new Login(rs.getString("username"), rs.getString("ip"));
+	        allUsers.add(login);
+	    }
+	    return allUsers;
+	}
+	
+	public ArrayList<Login> getOnlineUsers() throws ClassNotFoundException, SQLException {
+	    this.stm = c.createStatement();
+	    String sql = "Select * From " + table + " WHERE status = 'Online'";
+	    this.rs = stm.executeQuery(sql);
+	    ArrayList<Login> allUsers = new ArrayList<>();
+	    while (rs.next()) {
+	        Login login = new Login(rs.getString("username"), rs.getString("ip"));
+	        allUsers.add(login);
+	    }
+	    return allUsers;
+	}
+	
+
+	public ArrayList<Login> getDNDUsers() throws ClassNotFoundException, SQLException {
+	    this.stm = c.createStatement();
+	    String sql = "Select * From " + table + " WHERE status = 'Do Not Disturb'";
+	    this.rs = stm.executeQuery(sql);
+	    ArrayList<Login> allUsers = new ArrayList<>();
+	    while (rs.next()) {
+	        Login login = new Login(rs.getString("username"), rs.getString("ip"));
+	        allUsers.add(login);
+	    }
+	    return allUsers;
+	}
+	
+
+	public ArrayList<Login> getOfflineUsers() throws ClassNotFoundException, SQLException {
+	    this.stm = c.createStatement();
+	    String sql = "Select * From " + table + " WHERE status = 'Offline'";
+	    this.rs = stm.executeQuery(sql);
+	    ArrayList<Login> allUsers = new ArrayList<>();
+	    while (rs.next()) {
+	        Login login = new Login(rs.getString("username"), rs.getString("ip"));
+	        allUsers.add(login);
+	    }
+	    return allUsers;
 	}
 	
 	public void closeConnection() {

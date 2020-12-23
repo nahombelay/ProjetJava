@@ -27,6 +27,22 @@ public class User {
 	
 	}
 	
+	public Login getLogin() {
+		return login;
+	}
+
+	public void setLogin(Login login) {
+		this.login = login;
+	}
+
+	public MessagesDB getMessageDB() {
+		return messageDB;
+	}
+
+	public ActiveUsersDB getActiveUsers() {
+		return activeUsers;
+	}
+	
 	/**
 	 * Getting related info about user's IP @
 	 */
