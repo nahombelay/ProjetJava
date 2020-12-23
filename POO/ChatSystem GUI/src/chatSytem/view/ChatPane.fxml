@@ -31,7 +31,7 @@
           </Menu>
           <Menu mnemonicParsing="false" text="User">
             <items>
-              <MenuItem fx:id="changeUsernameItem" mnemonicParsing="false" text="Change Username" />
+              <MenuItem fx:id="changeUsernameItem" mnemonicParsing="false" onAction="#changeUsernameHandler" text="Change Username" />
                   <Menu fx:id="status" mnemonicParsing="false" text="Change Status">
                      <items>
                         <MenuItem fx:id="onlineItem" mnemonicParsing="false" onAction="#switchToOnline" text="Online" />

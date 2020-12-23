@@ -1,5 +1,8 @@
 package chatSytem.view;
 
+import java.io.IOException;
+
+import chatSytem.Main;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -85,32 +88,36 @@ public class ChatController {
 	}
 	@FXML
 	public void aboutSection() {
-		 // set alert type 
         a.setAlertType(AlertType.INFORMATION); 
         a.setTitle("About");
         a.setHeaderText("Created by Nahom Belay & Florian Leon");
         a.setContentText("Interfaces built with JavaFx and Scene Builder.\nFor more information, feel free to contact us !");
-        // show the dialog 
         a.show(); 
 	}
 	
 	@FXML
 	public void switchToOnline() {
 		System.out.println("Online");
-		//changer le statut a online
+		//changer le statut a online avec le servlet
 	}
 	
 	@FXML
 	public void switchToDND() {
 		System.out.println("Do Not Disturb");
-		//changer le statut a online
+		//changer le statut a online avec le servlet
 	}
 	
 	@FXML
 	public void switchToOffline() {
 		System.out.println("Offline");
-		//changer le statut a online
+		//changer le statut a online avec le servlet
 	}
 	
+	@FXML
+	public void changeUsernameHandler() throws IOException {
+		Main.showChangeUsernameLayout();
+	}
+	
+	//ouvrir la connenxion new Socket(ip, port);
 
 }

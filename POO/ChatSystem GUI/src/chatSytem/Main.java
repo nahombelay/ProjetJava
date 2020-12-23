@@ -5,9 +5,12 @@ import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import src.user.User;
 
 public class Main extends Application {
 	
@@ -15,6 +18,8 @@ public class Main extends Application {
 	private static BorderPane MainLayout;
 	private static BorderPane connexionLayout;
 	private static BorderPane chatLayout;
+	private static Stage stage;
+	public static User user;
 
 	@Override
 	public void start(Stage primaryStage) throws IOException {
@@ -48,6 +53,22 @@ public class Main extends Application {
 		chatLayout = loader.load();
 		connexionLayout.setVisible(false);
 		MainLayout.setCenter(chatLayout);
+	}
+	
+	public static void showChangeUsernameLayout() throws IOException {
+		FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(Main.class.getResource("./view/ChangeUsernamePane.fxml"));
+		Parent root = loader.load();
+		stage = new Stage();
+		stage.initModality(Modality.APPLICATION_MODAL);
+		stage.setOpacity(1);
+		stage.setTitle("Changing username");
+		stage.setScene(new Scene(root, 350, 200));
+		stage.showAndWait();
+	}
+	
+	public static void hideChangeUsernameLayout() {
+		stage.hide();
 	}
 
 

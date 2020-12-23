@@ -29,7 +29,7 @@ public class ConnexionController {
 	@FXML
 	private Label userTaken;
 	
-	private User user;
+	//private User user;
 	
 	
 	
@@ -51,13 +51,13 @@ public class ConnexionController {
 		RadioButton selectedRadioButton = (RadioButton) Location.getSelectedToggle();
 		String toogleGroupValue = selectedRadioButton.getText();
 	
-		if (toogleGroupValue == "Intern") {
+		if (toogleGroupValue.equals("Intern")) {
 			//On lance un nouvel user ? 
 			System.out.println(toogleGroupValue);
-			user = new User();
+			Main.user = new User();
 			//TODO: Check if it's unique --> we shoudn't continue if the username is not unique 
 			System.out.println(username);
-			boolean usernameChanged = user.changeUsername(username);
+			boolean usernameChanged = Main.user.changeUsername(username);
 			if (usernameChanged) {
 				
 				System.out.println("[Connexion Controller] Username changed to : " + username);
@@ -80,7 +80,7 @@ public class ConnexionController {
 			System.out.println(toogleGroupValue);
 		}
 		//ligne a supprimer ensuite
-		Main.showChatLayout();
+		//Main.showChatLayout();
 	}
 
 }
