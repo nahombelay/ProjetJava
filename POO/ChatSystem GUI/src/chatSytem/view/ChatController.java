@@ -1,12 +1,16 @@
 package chatSytem.view;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import chatSytem.Main;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -17,11 +21,15 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.util.Callback;
 
-public class ChatController {
+public class ChatController implements PropertyChangeListener {
 	
 	private ActiveUsersDB activeUsers;
 	
@@ -46,10 +54,9 @@ public class ChatController {
 	private Label dateLabel;
 	
 	@FXML
-	private TableView<Label> tableView;
+	private TableView<Login> tableView;
 	
-	//@FXML
-	//private TableColumn<Button, String> tbc;
+	//private TableColumn<Login, String> tbc;
 	
 	@FXML 
 	private ButtonBar buttonBar;
@@ -75,19 +82,109 @@ public class ChatController {
 	@FXML
 	private Menu status;
 	
+	private ObservableList<Login> usersList = FXCollections.observableArrayList();
+	
+	private ArrayList<Login> list;
 	
 	Alert a = new Alert(AlertType.NONE); 
 	
-	/*
-	 * @FXML private void initialize() { // Create column UserName (Data type of
-	 * String). tbc = new TableColumn<Button, String>("Users"); // Defines how to
-	 * fill data for each cell. // Get value from property of UserAccount. .
-	 * tbc.setCellValueFactory(new PropertyValueFactory<>("Users")); // Set Sort
-	 * type for userName column tbc.setSortType(TableColumn.SortType.DESCENDING); //
-	 * Display row data //ObservableList<Button> list = null;
-	 * //tableView.setItems(list); tableView.getColumns().addAll(tbc); }
-	 */
+	@FXML
+	private void initialize() throws ClassNotFoundException, SQLException {
+        activeUsers = Main.user.getActiveUsers();
+        activeUsers.addChangeListener(this);
+        list = activeUsers.getAllUsers();
+		for(Login l : list) {
+			addUser(l);
+		}
+        addButtonToTable(null);
+	}
 	
+	
+	private void addUser(Login l) {
+		ObservableList<Login> list = usersList;
+		list.add(l);
+		tableView.setItems(list);
+		usersList = list;
+	}
+	
+	private void addButtonToTable(String oldUsername) {
+		tableView.getColumns().clear();
+		TableColumn<Login, Void> colBtn = new TableColumn<Login, Void>("Users");
+        colBtn.setMinWidth(318);
+        colBtn.setMaxWidth(318);
+        //activeUsers = Main.user.getActiveUsers();
+
+        Callback<TableColumn<Login, Void>, TableCell<Login, Void>> cellFactory = new Callback<TableColumn<Login, Void>, TableCell<Login, Void>>() {
+            @Override
+            public TableCell<Login, Void> call(final TableColumn<Login, Void> param) {
+                final TableCell<Login, Void> cell = new TableCell<Login, Void>() {
+                	
+                    private final Button btn = new Button("Open");
+
+                    {
+                        btn.setOnAction((ActionEvent event) -> {
+                        	//TODO: change event :: fonction connect()
+                        	Login login = getTableView().getItems().get(getIndex());
+                            System.out.println("selectedData: " + login);
+                        });
+                        
+                    }
+
+					@Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            setGraphic(btn);
+                            Login login = getTableView().getItems().get(getIndex());
+                            btn.setText(login.getLogin());
+                            btn.setPrefWidth(318);
+                            btn.setMinWidth(318);
+                            btn.setMaxWidth(318);
+                            btn.setWrapText(true);
+                            Font font = Font.font("Arial", FontWeight.BOLD, 15);
+                            btn.setFont(font);
+                            //activeUsers = Main.user.getActiveUsers();
+//                            String status;
+//                            if (oldUsername != null) {
+//                            	if (oldUsername.equals(login.getLogin())) {
+//                            		status = activeUsers.getStatus(btn.getText());
+//                            	} else {
+//                            		status = activeUsers.getStatus(oldUsername);
+//                            		//btn.setText(oldUsername);
+//                            	}
+//                            } else {
+//                            	status = activeUsers.getStatus(btn.getText());
+//                            }
+
+                            String status = activeUsers.getStatus(btn.getText());
+                            System.out.println(status);
+                            if (status.equals("Online")) {
+                            	//vert
+                            	btn.setStyle("-fx-background-color: #00ff00");
+                            } else if (status.equals("Do Not Disturb")) {
+                            	//Violet
+                            	btn.setStyle("-fx-background-color: #7f00ff");
+                            } else if (status.equals("Offline")) {
+                            	//rouge
+                            	btn.setStyle("-fx-background-color: #ff0000");
+                            } else {
+                            	//white
+                            	btn.setStyle("-fx-background-color: #ffffff");
+                            }
+                        }
+                    }
+                };
+                return cell;
+            }
+        };
+
+        colBtn.setCellFactory(cellFactory);
+
+        tableView.getColumns().add(colBtn);
+
+    }
 	
 	//Method to display and hide chooseUser, endConvoButton and button bar
 	public void conversationOpen(boolean isOpen) {
@@ -106,6 +203,7 @@ public class ChatController {
 		dateLabel.setText("Conversation with " + date);
 		dateLabel.setVisible(true);
 	}
+	
 	@FXML
 	public void aboutSection() {
         a.setAlertType(AlertType.INFORMATION); 
@@ -164,51 +262,7 @@ public class ChatController {
 	public void changeUsernameHandler() throws IOException {
 		Main.showChangeUsernameLayout();
 	}
-	
-	
-	//TODO : rajouter observeur
-	/*
-	 * @FXML public void updateTable2() throws ClassNotFoundException, SQLException
-	 * { activeUsers = Main.user.getActiveUsers(); ArrayList<Login> list =
-	 * activeUsers.getAllUsers(); ObservableList<Button> list2 =
-	 * tableView.getItems(); for(Login l : list) { Button btn = new Button();
-	 * btn.setMinWidth(328); btn.setMinHeight(50); btn.setVisible(true);
-	 * btn.setText(l.getLogin()); btn.setOnAction(new EventHandler<ActionEvent>() {
-	 * 
-	 * @Override public void handle(ActionEvent event) {
-	 * System.out.println(btn.getText()); //Or "1" as sin your code } });
-	 * list2.add(btn); System.out.println(list2.toString()); tbc.setVisible(true); }
-	 * //return list2;
-	 * 
-	 * }
-	 */
-	
-	@FXML
-	public void updateTable() throws ClassNotFoundException, SQLException {
-		activeUsers = Main.user.getActiveUsers();
-		ArrayList<Login> list = activeUsers.getAllUsers();
-		for(Login l : list) {
-			Label name = new Label();
-			name.setPrefWidth(328);
-			name.setPrefHeight(50);
-			name.setMinWidth(328);
-			name.setMinHeight(50);
-			name.setMaxWidth(328);
-			name.setMaxHeight(50);
-			name.setText(l.getLogin());
-			name.setOnMouseClicked(new EventHandler<MouseEvent>() {
-				@Override
-				public void handle(MouseEvent arg0) {
-					System.out.println("test");
-					
-				}
-            });
-			tableView.getItems().add(name);
-		}
-	}
-	
-	
-	
+
 	//NE marche pas encore : regarder https://stackoverflow.com/questions/12153622/how-to-close-a-javafx-application-on-window-close 
 	@FXML
 	public void quitHandler() {
@@ -217,8 +271,75 @@ public class ChatController {
 		Platform.exit();
 		//Main.closeStage();
 	}
+
+
+	@Override
+	public void propertyChange(PropertyChangeEvent event) {
+		if (event.getPropertyName().equals("newUser")) {
+			newUserHandler(event.getOldValue().toString(), event.getNewValue().toString());
+		} else if (event.getPropertyName().equals("updateUser")) {
+			updateUserHandler(event.getOldValue().toString(), event.getNewValue().toString());
+		} else if (event.getPropertyName().equals("deleteUser")) {
+			deleteUserHandler(event.getOldValue().toString(), event.getNewValue().toString());
+		}  else if (event.getPropertyName().equals("changeStatus")) {
+			//updateUserHandler(event.getOldValue().toString(), event.getNewValue().toString());
+			//addButtonToTable();
+			tableView.refresh();
+		} else {
+			System.out.println("Wrong event");
+		}
+		
+	}
+
+
+	private void deleteUserHandler(String ip, String username) {
+		//delUser(new Login(username, ip));
+		activeUsers = Main.user.getActiveUsers();
+		try {
+			list = activeUsers.getAllUsers();
+			addButtonToTable(null);
+		} catch (ClassNotFoundException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+
+	private void updateUserHandler(String oldUsername, String username) {
+
+		String ip = activeUsers.getCurrentIp(username);
+		Login newLogin = new Login(username, ip);
+		ObservableList<Login> list = tableView.getItems();
+		int index = 0;
+		for (Login l : list) {
+			if (l.getIp().equals(ip)) {
+				list.remove(index);
+			}
+			index++;
+		}
+		list.add(newLogin);
+		tableView.setItems(list);
+		addButtonToTable(username);
+		tableView.refresh();
+		
+		
+	}
+
+
+	private void newUserHandler(String ip, String username) {
+		  activeUsers = Main.user.getActiveUsers(); 
+		  try { 
+			  list = activeUsers.getAllUsers(); 
+			  addUser(list.get(list.size()-1));
+			  addButtonToTable(null); 
+		  } catch (ClassNotFoundException | SQLException e) { 
+			  // TODO Auto-generated catch block 
+			  e.printStackTrace(); 
+		}
+		 
+		
+	}
 	
-	//ouvrir la connenxion new Socket(ip, port);
-	//Rajouter une methode close dans user ?
 
 }

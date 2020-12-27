@@ -23,6 +23,10 @@ public class Login {
 	public String getLogin() {
 		return login;
 	}
+	
+	public String getIp() {
+		return ip;
+	}
 
 	/**
 	 * Change user's username

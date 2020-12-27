@@ -25,7 +25,7 @@ public class ChangeUsernameController {
 	
 	public void buttonHandler() throws UnknownHostException, IOException {
 		String newUsername = textField.getText();
-		activeUsers = Main.user.getActiveUsers();
+		this.activeUsers = Main.user.getActiveUsers();
 		boolean usernameChanged = Main.user.changeUsername(newUsername);
 		if (usernameChanged) {
 			System.out.println("[Change Username Controller] Username changed to : " + newUsername);

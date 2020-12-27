@@ -15,6 +15,12 @@ import src.user.User;
 public class Main extends Application {
 	
 	private Stage primaryStage;
+	
+	public Stage getPrimaryStage() {
+		return primaryStage;
+	}
+
+
 	private static BorderPane MainLayout;
 	private static BorderPane connexionLayout;
 	private static BorderPane chatLayout;

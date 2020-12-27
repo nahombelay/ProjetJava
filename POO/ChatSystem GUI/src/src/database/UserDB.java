@@ -1,8 +1,12 @@
 package src.database;
 
 import java.sql.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.List;
 
+import chatSytem.view.ChatController;
 import src.user.Login;
 
 //UserDB will be used to save all the users our user has interacted with in the past but also 
@@ -10,6 +14,8 @@ import src.user.Login;
 
 
 public class UserDB {
+	
+	private List<PropertyChangeListener> listener = new ArrayList<PropertyChangeListener>();
 	
 	private Connection c = null;
 	private Statement stm = null;
@@ -73,6 +79,32 @@ public class UserDB {
 		} else {
 			throw new Exception("Wrong Status");
 		}
+		notifyListeners(ChatController.class, "changeStatus", username, status);
+	}
+	
+	public String getStatus(String username) {
+		String query = "SELECT status FROM " + table + " WHERE username = '" + username + "';";
+		System.out.println(query);
+		//String query = "SELECT status from " + table + " WHERE username = ?;";
+		String status = null;
+		/*
+		 * try { this.pstm = c.prepareStatement(query); this.pstm.setString(1,
+		 * username); this.rs = pstm.executeQuery(); status = rs.getString(1);
+		 * this.pstm.close(); this.rs.close(); } catch (SQLException e) { // TODO
+		 * Auto-generated catch block e.printStackTrace(); }
+		 */
+		try {
+			this.stm = c.createStatement();
+			this.rs = stm.executeQuery(query);
+			status = rs.getString(1);
+			stm.close();
+			rs.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return status;
 	}
 	
 	public void addUser(String ip, String username) {
@@ -89,6 +121,7 @@ public class UserDB {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		notifyListeners(ChatController.class, "newUser", ip, username);
 	}
 	
 	public void deleteUser(String ip, String username) {
@@ -105,14 +138,16 @@ public class UserDB {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		notifyListeners(ChatController.class, "deleteUser", ip, username);
 	}
 	
-	public void updateUser(String ip, String username) {
+	public void updateUser(String ip, String newUsername) {
+		String oldUsername = getCurrentUsername(ip);
 		String query = "UPDATE " + table + " SET username = ? WHERE ip = ?;";
 		
 		try {
 			this.pstm = c.prepareStatement(query);
-			this.pstm.setString(1, username);
+			this.pstm.setString(1, newUsername);
 			this.pstm.setString(2, ip);
 			this.rowsModified = pstm.executeUpdate();
 			
@@ -122,8 +157,41 @@ public class UserDB {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		notifyListeners(ChatController.class, "updateUser", oldUsername, newUsername);
 	}
 	
+	public String getCurrentUsername(String ip) {
+		String query = "SELECT username FROM " + table + " WHERE ip = '" + ip + "';";
+		String username = null;
+		try {
+			this.stm = c.createStatement();
+			this.rs = stm.executeQuery(query);
+			username = rs.getString(1);
+			stm.close();
+			rs.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return username;
+	}
+	
+	public String getCurrentIp(String username) {
+		String query = "SELECT ip FROM " + table + " WHERE username = '" + username + "';";
+		String ip = null;
+		try {
+			this.stm = c.createStatement();
+			this.rs = stm.executeQuery(query);
+			ip = rs.getString(1);
+			stm.close();
+			rs.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return ip;
+	}
+
 	public boolean hasValue(String username) {
 		String query = "SELECT COUNT (1) FROM " + table + " WHERE username = '" + username + "' ;";
 		boolean rep = false;
@@ -143,7 +211,7 @@ public class UserDB {
 	public boolean hasKey(String ip) {
 		//String query = "SELECT COUNT (1) FROM " + table + " WHERE ip = '" + ip + "' ;";
 		String query = "SELECT COUNT (1) FROM " + table + " WHERE ip = '" + ip + "';";
-		System.out.println(query);
+		///System.out.println(query);
 		boolean rep = false;
 		try {
 			this.stm = c.createStatement();
@@ -182,6 +250,8 @@ public class UserDB {
 	        Login login = new Login(rs.getString("username"), rs.getString("ip"));
 	        allUsers.add(login);
 	    }
+	    this.stm.close();
+	    this.rs.close();
 	    return allUsers;
 	}
 	
@@ -207,6 +277,8 @@ public class UserDB {
 	        Login login = new Login(rs.getString("username"), rs.getString("ip"));
 	        allUsers.add(login);
 	    }
+	    this.stm.close();
+	    this.rs.close();
 	    return allUsers;
 	}
 	
@@ -220,6 +292,8 @@ public class UserDB {
 	        Login login = new Login(rs.getString("username"), rs.getString("ip"));
 	        allUsers.add(login);
 	    }
+	    this.stm.close();
+	    this.rs.close();
 	    return allUsers;
 	}
 	
@@ -232,7 +306,15 @@ public class UserDB {
 		}
 	}
 	
-	
+	private void notifyListeners(Object object, String property, String ip, String username) {
+        for (PropertyChangeListener name : listener) {
+            name.propertyChange(new PropertyChangeEvent(this, property, ip, username));
+        }
+    }
+
+    public void addChangeListener(PropertyChangeListener newListener) {
+        listener.add(newListener);
+    }
 	
 	/*
 	 * public static void main (String argv[]) { UserDB bd = new UserDB();
