@@ -82,17 +82,10 @@ public class UserDB {
 		notifyListeners(ChatController.class, "changeStatus", username, status);
 	}
 	
-	public String getStatus(String username) {
-		String query = "SELECT status FROM " + table + " WHERE username = '" + username + "';";
+	public String getStatus(String ip) {
+		String query = "SELECT status FROM " + table + " WHERE ip = '" + ip + "';";
 		System.out.println(query);
-		//String query = "SELECT status from " + table + " WHERE username = ?;";
 		String status = null;
-		/*
-		 * try { this.pstm = c.prepareStatement(query); this.pstm.setString(1,
-		 * username); this.rs = pstm.executeQuery(); status = rs.getString(1);
-		 * this.pstm.close(); this.rs.close(); } catch (SQLException e) { // TODO
-		 * Auto-generated catch block e.printStackTrace(); }
-		 */
 		try {
 			this.stm = c.createStatement();
 			this.rs = stm.executeQuery(query);
@@ -306,7 +299,7 @@ public class UserDB {
 		}
 	}
 	
-	private void notifyListeners(Object object, String property, String ip, String username) {
+	private synchronized void notifyListeners(Object object, String property, String ip, String username) {
         for (PropertyChangeListener name : listener) {
             name.propertyChange(new PropertyChangeEvent(this, property, ip, username));
         }

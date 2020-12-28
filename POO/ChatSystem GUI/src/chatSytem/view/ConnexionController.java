@@ -58,14 +58,11 @@ public class ConnexionController {
 			Main.user = new User();
 			activeUsers = Main.user.getActiveUsers();
 			//Check if it's unique --> we shoudn't continue if the username is not unique 
-			System.out.println(username);
 			boolean usernameChanged = Main.user.changeUsername(username);
 			if (usernameChanged) {
-				System.out.println("[Connexion Controller] Username changed to : " + username);
 				//Get the status
 				String status = choiceBox.getSelectionModel().getSelectedItem();
 				activeUsers.changeStatus(username, status);
-				System.out.println(status);
 				//Last part before displaying the chat screen
 				Main.showChatLayout();
 				

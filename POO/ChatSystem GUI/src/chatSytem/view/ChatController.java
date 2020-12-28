@@ -96,7 +96,7 @@ public class ChatController implements PropertyChangeListener {
 		for(Login l : list) {
 			addUser(l);
 		}
-        addButtonToTable(null);
+        addButtonToTable();
 	}
 	
 	
@@ -107,13 +107,13 @@ public class ChatController implements PropertyChangeListener {
 		usersList = list;
 	}
 	
-	private void addButtonToTable(String oldUsername) {
+	private void addButtonToTable() {
 		tableView.getColumns().clear();
+		
 		TableColumn<Login, Void> colBtn = new TableColumn<Login, Void>("Users");
         colBtn.setMinWidth(318);
         colBtn.setMaxWidth(318);
-        //activeUsers = Main.user.getActiveUsers();
-
+        
         Callback<TableColumn<Login, Void>, TableCell<Login, Void>> cellFactory = new Callback<TableColumn<Login, Void>, TableCell<Login, Void>>() {
             @Override
             public TableCell<Login, Void> call(final TableColumn<Login, Void> param) {
@@ -145,20 +145,7 @@ public class ChatController implements PropertyChangeListener {
                             btn.setWrapText(true);
                             Font font = Font.font("Arial", FontWeight.BOLD, 15);
                             btn.setFont(font);
-                            //activeUsers = Main.user.getActiveUsers();
-//                            String status;
-//                            if (oldUsername != null) {
-//                            	if (oldUsername.equals(login.getLogin())) {
-//                            		status = activeUsers.getStatus(btn.getText());
-//                            	} else {
-//                            		status = activeUsers.getStatus(oldUsername);
-//                            		//btn.setText(oldUsername);
-//                            	}
-//                            } else {
-//                            	status = activeUsers.getStatus(btn.getText());
-//                            }
-
-                            String status = activeUsers.getStatus(btn.getText());
+                            String status = activeUsers.getStatus(login.getIp());
                             System.out.println(status);
                             if (status.equals("Online")) {
                             	//vert
@@ -282,8 +269,6 @@ public class ChatController implements PropertyChangeListener {
 		} else if (event.getPropertyName().equals("deleteUser")) {
 			deleteUserHandler(event.getOldValue().toString(), event.getNewValue().toString());
 		}  else if (event.getPropertyName().equals("changeStatus")) {
-			//updateUserHandler(event.getOldValue().toString(), event.getNewValue().toString());
-			//addButtonToTable();
 			tableView.refresh();
 		} else {
 			System.out.println("Wrong event");
@@ -297,7 +282,7 @@ public class ChatController implements PropertyChangeListener {
 		activeUsers = Main.user.getActiveUsers();
 		try {
 			list = activeUsers.getAllUsers();
-			addButtonToTable(null);
+			addButtonToTable();
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -311,19 +296,29 @@ public class ChatController implements PropertyChangeListener {
 		String ip = activeUsers.getCurrentIp(username);
 		Login newLogin = new Login(username, ip);
 		ObservableList<Login> list = tableView.getItems();
-		int index = 0;
-		for (Login l : list) {
-			if (l.getIp().equals(ip)) {
-				list.remove(index);
+		int size = list.size();
+		System.out.println(size);
+		if(size == 0) {
+			list.add(newLogin);
+		} else if (size == 1) {
+			list.add(newLogin);
+			list.remove(0);
+		} else {
+			int index = 0;
+			for(int i = 0; i < size; i++) {
+				if (list.get(i).getIp().equals(ip)) {
+					//on recupere le premier indice à supprimer
+					//si on met le list.remove on a un debordement de tableau
+					index = i;
+					break;
+				}
 			}
-			index++;
+			list.remove(index);
+			list.add(newLogin);
 		}
-		list.add(newLogin);
+	
 		tableView.setItems(list);
-		addButtonToTable(username);
-		tableView.refresh();
-		
-		
+		addButtonToTable();
 	}
 
 
@@ -332,7 +327,7 @@ public class ChatController implements PropertyChangeListener {
 		  try { 
 			  list = activeUsers.getAllUsers(); 
 			  addUser(list.get(list.size()-1));
-			  addButtonToTable(null); 
+			  addButtonToTable(); 
 		  } catch (ClassNotFoundException | SQLException e) { 
 			  // TODO Auto-generated catch block 
 			  e.printStackTrace(); 
