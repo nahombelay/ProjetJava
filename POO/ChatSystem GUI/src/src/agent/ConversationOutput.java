@@ -46,7 +46,7 @@ public class ConversationOutput extends Thread {
 		System.out.println("[ConversationOutput] You can now enter a message...");
 		while(!stop) {
 			msg = scan.nextLine();
-			stcp.sendTextTCP("[ConversationOutput] " + msg);
+			stcp.sendTextTCP(msg);
 			
 			String timestamp = Timestamp.formatDateTime();
 			messagesDB.addMessage(ipDest, true, msg);

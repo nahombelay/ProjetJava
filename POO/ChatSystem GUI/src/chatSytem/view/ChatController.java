@@ -3,8 +3,10 @@ package chatSytem.view;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import chatSytem.Main;
 import javafx.application.Platform;
@@ -12,9 +14,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import src.agent.ConversationInput;
+import src.agent.InitiateConversation;
+import src.communications.sendTCP;
 import src.database.ActiveUsersDB;
+import src.database.MessagesDB;
+import src.messages.Timestamp;
 import src.user.Login;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -25,6 +34,12 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.util.Callback;
@@ -34,6 +49,12 @@ public class ChatController implements PropertyChangeListener {
 	private ActiveUsersDB activeUsers;
 	
 	private Login login;
+	
+	@FXML
+	private VBox vbox;
+	
+	@FXML
+	private AnchorPane chatPane;
 	
 	@FXML
 	private Button endConvoButton;
@@ -55,8 +76,6 @@ public class ChatController implements PropertyChangeListener {
 	
 	@FXML
 	private TableView<Login> tableView;
-	
-	//private TableColumn<Login, String> tbc;
 	
 	@FXML 
 	private ButtonBar buttonBar;
@@ -86,7 +105,18 @@ public class ChatController implements PropertyChangeListener {
 	
 	private ArrayList<Login> list;
 	
+	private Conversations convList;
+	
+	private MessagesDB MDB;
+	
+	private String activeIp = null;
+	
+	private sendTCP stcp;
+	
 	Alert a = new Alert(AlertType.NONE); 
+	
+	
+	//Methods
 	
 	@FXML
 	private void initialize() throws ClassNotFoundException, SQLException {
@@ -97,8 +127,9 @@ public class ChatController implements PropertyChangeListener {
 			addUser(l);
 		}
         addButtonToTable();
+        convList = new Conversations();
+        this.MDB = new MessagesDB();
 	}
-	
 	
 	private void addUser(Login l) {
 		ObservableList<Login> list = usersList;
@@ -123,9 +154,8 @@ public class ChatController implements PropertyChangeListener {
 
                     {
                         btn.setOnAction((ActionEvent event) -> {
-                        	//TODO: change event :: fonction connect()
                         	Login login = getTableView().getItems().get(getIndex());
-                            System.out.println("selectedData: " + login);
+                            startConnexion(login);
                         });
                         
                     }
@@ -162,6 +192,8 @@ public class ChatController implements PropertyChangeListener {
                             }
                         }
                     }
+
+				
                 };
                 return cell;
             }
@@ -187,7 +219,7 @@ public class ChatController implements PropertyChangeListener {
 	}
 	
 	public void updateDateLabel(String date) {
-		dateLabel.setText("Conversation with " + date);
+		dateLabel.setText("Date : " + date);
 		dateLabel.setVisible(true);
 	}
 	
@@ -270,12 +302,31 @@ public class ChatController implements PropertyChangeListener {
 			deleteUserHandler(event.getOldValue().toString(), event.getNewValue().toString());
 		}  else if (event.getPropertyName().equals("changeStatus")) {
 			tableView.refresh();
+		} else if (event.getPropertyName().equals("incomingMSG")) {
+			incomingMSG(event.getOldValue().toString(), event.getNewValue().toString());
 		} else {
 			System.out.println("Wrong event");
 		}
 		
 	}
 
+	private void incomingMSG(String ip, String msg) {
+		//look if the conversation is active
+		if (activeIp.equals(ip)) {
+			//then the conversation is active so we display the message
+			Platform.runLater(new Runnable() {
+			    @Override
+			    public void run() {
+			        // Update UI here.
+			    	display(msg, false, Timestamp.formatDateTimeFull());
+			    }
+			});
+			//display(msg, false, Timestamp.formatDateTimeFull());
+		}
+		//if the conversation is not active we already store the message in the DB
+		//we have nothing left to do 
+		
+	}
 
 	private void deleteUserHandler(String ip, String username) {
 		//delUser(new Login(username, ip));
@@ -323,6 +374,7 @@ public class ChatController implements PropertyChangeListener {
 
 
 	private void newUserHandler(String ip, String username) {
+
 		  activeUsers = Main.user.getActiveUsers(); 
 		  try { 
 			  list = activeUsers.getAllUsers(); 
@@ -335,6 +387,130 @@ public class ChatController implements PropertyChangeListener {
 		 
 		
 	}
+	
+	private void startConnexion(Login login) {
+		String ip = login.getIp();
+		this.activeIp = ip;
+		InitiateConversation conv = new InitiateConversation(ip, MDB);
+		conv.start();
+		conversationOpen(true);
+		updateConvoWithLabel(login.getLogin());
+		updateDateLabel(Timestamp.formatDateTime());
+		Socket sock = conv.getSocket();
+		ConversationInput ci = new ConversationInput(sock, MDB);
+		ci.addChangeListener(this);
+		ci.start();
+		convList.addConv(ip, sock);
+		//displayHistory(ip);
+		try {
+			stcp = new sendTCP(sock);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	@FXML
+	private void closeConv() throws IOException {
+		String ip = activeIp;
+		if (ip == null) {
+			System.out.println("Select a user to get his ip");
+		} else {
+			Socket sock = convList.getSocket(ip);
+			convList.removeConv(ip, sock);
+			sock.close();
+			conversationOpen(false);
+		}
+		
+	}
+	
+	@FXML
+	private void sendMessage() {
+		String ip = activeIp;
+		if (ip == null) {
+			System.out.println("Select a user to get his ip");
+		} else {
+			String text = textArea.getText();
+			if (text == null || text.equals("")) {
+				System.out.println("Empty Message");
+			} else {
+				MDB.addMessage(ip, true, text);
+				//send message
+				stcp.sendTextTCP(text);
+				//display the message
+				String timestamp = Timestamp.formatDateTimeFull();
+				display(text, true, timestamp);
+				textArea.setText("");
+			}
+			
+		}
+		
+	}
+	
+	private void display(String msg, boolean isSender, String timestamp) {
+		Label label = new Label(); 
+		label.setMinWidth(vbox.getMinWidth());
+		label.setMaxWidth(vbox.getMaxWidth());
+		label.setPrefWidth(vbox.getPrefWidth());
+		String textToDisplay = null;
+		if (isSender) {
+			textToDisplay = msg + " : " + timestamp;
+			label.setAlignment(Pos.CENTER_RIGHT);
+			label.setBackground(new Background(new BackgroundFill(Color.CORNFLOWERBLUE, new CornerRadii(8), new Insets(16))));
+		} else {
+			textToDisplay = timestamp + " : " + msg;
+			label.setAlignment(Pos.CENTER_LEFT);
+			label.setBackground(new Background(new BackgroundFill(Color.GREY, new CornerRadii(8), new Insets(16))));
+		}
+		label.setText(textToDisplay);
+		vbox.getChildren().add(label);
+	}
+	
+	
+	private void displayHistory(String ip) {
+		List<ArrayList<String>> array = MDB.getMessages(ip);
+		if (array != null) {
+			ArrayList<String> textArray = array.get(0);
+			ArrayList<String> timeArray = array.get(1);
+			ArrayList<String> posArray = array.get(2);
+			int size = textArray.size();
+			boolean isSender;
+			for (int i = 0 ; i < size ; i++) {
+				if (posArray.get(i).equals("true")) {
+					isSender = true;
+				} else {
+					isSender = false;
+				}
+				display(textArray.get(i), isSender, timeArray.get(i));
+			}
+		}
+		
+
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 
 }

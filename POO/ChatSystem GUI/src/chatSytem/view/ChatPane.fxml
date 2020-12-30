@@ -18,6 +18,7 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" stylesheets="@chat.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="chatSytem.view.ChatController">
    <top>
@@ -101,9 +102,10 @@
                                     </GridPane>
                                     <ScrollPane hbarPolicy="NEVER" prefHeight="513.5" prefWidth="870.0" GridPane.rowIndex="1">
                                       <content>
-                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="513.5" prefWidth="870.0">
+                                        <AnchorPane fx:id="chatPane" minHeight="0.0" minWidth="0.0" prefHeight="513.5" prefWidth="870.0">
                                              <children>
                                                 <Label fx:id="chooseUser" alignment="CENTER" contentDisplay="CENTER" layoutX="330.25" layoutY="248.25" text="Choose an User to start a conversation…" />
+                                                <VBox fx:id="vbox" layoutX="128.0" layoutY="48.0" prefHeight="514.0" prefWidth="852.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="18.0" AnchorPane.topAnchor="0.0" />
                                              </children>
                                           </AnchorPane>
                                       </content>
@@ -124,7 +126,7 @@
                                  <children>
                                     <ButtonBar fx:id="buttonBar" prefHeight="27.0" prefWidth="870.0" visible="false" GridPane.rowIndex="1">
                                       <buttons>
-                                        <Button fx:id="endConvoButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" text="End Conversation" translateX="-377.75" visible="false" />
+                                        <Button fx:id="endConvoButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#closeConv" text="End Conversation" translateX="-377.75" visible="false" />
                                       </buttons>
                                     </ButtonBar>
                                     <GridPane>
@@ -137,7 +139,7 @@
                                       </rowConstraints>
                                        <children>
                                           <TextArea fx:id="textArea" prefHeight="200.0" prefWidth="200.0" promptText="Enter Message…" />
-                                          <Button fx:id="sendButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="45.0" prefWidth="45.0" style="-fx-border-width: 0; -fx-border-color: none;" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                                          <Button fx:id="sendButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#sendMessage" prefHeight="45.0" prefWidth="45.0" style="-fx-border-width: 0; -fx-border-color: none;" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                                              <graphic>
                                                 <ImageView fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
                                                    <image>

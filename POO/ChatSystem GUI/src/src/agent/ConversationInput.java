@@ -1,15 +1,21 @@
 package src.agent;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
+import chatSytem.view.ChatController;
 import src.database.MessagesDB;
-import src.messages.Timestamp;
 
 public class ConversationInput extends Thread {
+	
+	private List<PropertyChangeListener> listener = new ArrayList<PropertyChangeListener>();
 	
 	private Socket socketInput;
 	private static BufferedReader inputBuffer;
@@ -39,14 +45,13 @@ public class ConversationInput extends Thread {
 				if (resp == null) {
 					System.out.println("[ConversationInput] " + socketInput.toString() + " : End of Conversation.");
 					socketInput.close();
-					//TODO: cancel thread
 					break;
 				} 
-				String timestamp = Timestamp.formatDateTime();
-				System.out.println("[ConversationInput] " + socketInput.toString() + " --- " + timestamp + " : " + resp);
-				messagesDB.addMessage(ipDest, false, resp);
+				//System.out.println("[ConversationInput] " + socketInput.toString() + " --- " + timestamp + " : " + resp);
 				//stocker le message dans la base de donnée
-				
+				messagesDB.addMessage(ipDest, false, resp);
+				//send a signal to chat Controller
+				notifyListeners(ChatController.class, "incomingMSG", ipDest, resp);
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -60,5 +65,15 @@ public class ConversationInput extends Thread {
 	public Socket getSocketInput() {
 		return socketInput;
 	}
+	
+	private synchronized void notifyListeners(Object object, String property, String ip, String username) {
+        for (PropertyChangeListener name : listener) {
+            name.propertyChange(new PropertyChangeEvent(this, property, ip, username));
+        }
+    }
+
+    public void addChangeListener(PropertyChangeListener newListener) {
+        listener.add(newListener);
+    }
 
 }

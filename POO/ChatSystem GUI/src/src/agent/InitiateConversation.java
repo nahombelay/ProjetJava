@@ -18,13 +18,26 @@ public class InitiateConversation extends Thread{
 	}
 	
 	public void run() {
-		ConversationInput ci = new ConversationInput(socket, messagesDB);
-		ConversationOutput co = new ConversationOutput(socket, messagesDB);
-        ci.start();
-        co.start();
+//		ConversationInput ci = new ConversationInput(socket, messagesDB);
+//		ConversationOutput co = new ConversationOutput(socket, messagesDB);
+//        ci.start();
+//        co.start();
+		System.out.println("Bind done !");
 	}
-	public static void main(String[] args) {
-		new InitiateConversation("localhost", new MessagesDB()).start();
+	
+	public void close() {
+		ConversationInput.stop = true;
+		ConversationOutput.stop = true;
 	}
+	
+	public Socket getSocket() {
+		return this.socket;
+	}
+	
+	
+	
+//	public static void main(String[] args) {
+//		new InitiateConversation("localhost", new MessagesDB()).start();
+//	}
 
 }
