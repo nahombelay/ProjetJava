@@ -66,9 +66,9 @@ public class ConversationInput extends Thread {
 		return socketInput;
 	}
 	
-	private synchronized void notifyListeners(Object object, String property, String ip, String username) {
+	private synchronized void notifyListeners(Object object, String property, String ip, String msg) {
         for (PropertyChangeListener name : listener) {
-            name.propertyChange(new PropertyChangeEvent(this, property, ip, username));
+            name.propertyChange(new PropertyChangeEvent(this, property, ip, msg));
         }
     }
 

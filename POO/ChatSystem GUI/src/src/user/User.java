@@ -23,7 +23,7 @@ public class User {
 		this.settingIPInfo();
 		this.initialisation();
 		this.threadUDP();
-		this.threadTCP();
+		//this.threadTCP();
 	
 	}
 	

@@ -16,6 +16,7 @@ public class BindToPeer {
 		this.port = port;
 		try {
 			this.socket = new Socket(this.ip,this.port);
+			System.out.println(socket);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

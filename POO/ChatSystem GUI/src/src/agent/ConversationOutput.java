@@ -47,8 +47,7 @@ public class ConversationOutput extends Thread {
 		while(!stop) {
 			msg = scan.nextLine();
 			stcp.sendTextTCP(msg);
-			
-			String timestamp = Timestamp.formatDateTime();
+	
 			messagesDB.addMessage(ipDest, true, msg);
 			//stocker le message dans la base de donnée avec timestamp
 		}

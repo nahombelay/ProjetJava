@@ -5,6 +5,7 @@ import java.beans.PropertyChangeListener;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -23,6 +24,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import src.agent.ConversationInput;
 import src.agent.InitiateConversation;
+import src.agent.ListenSocket;
+import src.agent.MainSocket;
 import src.communications.sendTCP;
 import src.database.ActiveUsersDB;
 import src.database.MessagesDB;
@@ -115,9 +118,10 @@ public class ChatController implements PropertyChangeListener {
 	
 	private String activeIp = null;
 	
-	private sendTCP stcp;
-	
 	private ConversationInput activeCi;
+	
+	private ServerSocket serverSocket;
+	
 	
 	Alert a = new Alert(AlertType.NONE); 
 	
@@ -125,7 +129,7 @@ public class ChatController implements PropertyChangeListener {
 	//Methods
 	
 	@FXML
-	private void initialize() throws ClassNotFoundException, SQLException {
+	private void initialize() throws ClassNotFoundException, SQLException, IOException {
         activeUsers = Main.user.getActiveUsers();
         activeUsers.addChangeListener(this);
         list = activeUsers.getAllUsers();
@@ -135,9 +139,17 @@ public class ChatController implements PropertyChangeListener {
         addButtonToTable();
         convList = new Conversations();
         this.MDB = new MessagesDB();
+        threadTCP();
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 10, 10, 10));
         vbox.setMaxHeight(Double.MAX_VALUE);
+	}
+	
+	private void threadTCP() {
+		MainSocket mainSock = new MainSocket();
+		this.serverSocket = mainSock.getSocketServeur();
+		ListenSocket listenSock = new ListenSocket(serverSocket, MDB);
+		listenSock.start();
 	}
 	
 	private void addUser(Login l) {
@@ -313,10 +325,16 @@ public class ChatController implements PropertyChangeListener {
 			tableView.refresh();
 		} else if (event.getPropertyName().equals("incomingMSG")) {
 			incomingMSG(event.getOldValue().toString(), event.getNewValue().toString());
+		} else if (event.getPropertyName().equals("accept")) {
+			startConv(event.getOldValue().toString(), (Socket) event.getNewValue());
 		} else {
 			System.out.println("Wrong event");
 		}
 		
+	}
+
+	private void startConv(String ip, Socket sock) {
+		convList.addConv(ip, sock);
 	}
 
 	private void incomingMSG(String ip, String msg) {
@@ -337,7 +355,6 @@ public class ChatController implements PropertyChangeListener {
 		}
 		//if the conversation is not active we already store the message in the DB
 		//we have nothing left to do 
-		
 	}
 
 	private void deleteUserHandler(String ip, String username) {
@@ -408,21 +425,22 @@ public class ChatController implements PropertyChangeListener {
 		conversationOpen(true);
 		updateConvoWithLabel(login.getLogin());
 		updateDateLabel(Timestamp.formatDateTime());
-		Socket sock = conv.getSocket();
+		Socket sock = null;
+		if (!convList.hasKey(ip)) {
+			sock = conv.getSocket();
+			convList.addConv(ip, sock);
+		} else {
+			sock = convList.getSocket(ip);
+		}
 		ConversationInput ci = new ConversationInput(sock, MDB);
 		activeCi = ci;
 		activeCi.addChangeListener(this);
 		activeCi.start();
-		convList.addConv(ip, sock);
+
 		//displayHistory(ip);
 
-//		try {
-//			stcp = new sendTCP(sock);
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 	}
+
 	
 	@FXML
 	private void closeConv() throws IOException {
@@ -443,6 +461,7 @@ public class ChatController implements PropertyChangeListener {
 	private void sendMessage() {
 		String ip = activeIp;
 		Socket sock = convList.getSocket(ip);
+		System.out.println(sock);
 		sendTCP stcp = null;
 		try {
 			stcp = new sendTCP(sock);
