@@ -2,7 +2,9 @@ package chatSytem.view;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,6 +15,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -34,6 +37,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -113,6 +117,8 @@ public class ChatController implements PropertyChangeListener {
 	
 	private sendTCP stcp;
 	
+	private ConversationInput activeCi;
+	
 	Alert a = new Alert(AlertType.NONE); 
 	
 	
@@ -129,6 +135,9 @@ public class ChatController implements PropertyChangeListener {
         addButtonToTable();
         convList = new Conversations();
         this.MDB = new MessagesDB();
+        vbox.setSpacing(5);
+        vbox.setPadding(new Insets(10, 10, 10, 10));
+        vbox.setMaxHeight(Double.MAX_VALUE);
 	}
 	
 	private void addUser(Login l) {
@@ -312,7 +321,10 @@ public class ChatController implements PropertyChangeListener {
 
 	private void incomingMSG(String ip, String msg) {
 		//look if the conversation is active
-		if (activeIp.equals(ip)) {
+		boolean test = activeIp.equals(ip);
+		System.out.println(test);
+		if (test) {
+			System.out.println(msg + " : " + ip);
 			//then the conversation is active so we display the message
 			Platform.runLater(new Runnable() {
 			    @Override
@@ -398,16 +410,18 @@ public class ChatController implements PropertyChangeListener {
 		updateDateLabel(Timestamp.formatDateTime());
 		Socket sock = conv.getSocket();
 		ConversationInput ci = new ConversationInput(sock, MDB);
-		ci.addChangeListener(this);
-		ci.start();
+		activeCi = ci;
+		activeCi.addChangeListener(this);
+		activeCi.start();
 		convList.addConv(ip, sock);
 		//displayHistory(ip);
-		try {
-			stcp = new sendTCP(sock);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+//		try {
+//			stcp = new sendTCP(sock);
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 	
 	@FXML
@@ -419,6 +433,7 @@ public class ChatController implements PropertyChangeListener {
 			Socket sock = convList.getSocket(ip);
 			convList.removeConv(ip, sock);
 			sock.close();
+			//activeCi.stop = true;
 			conversationOpen(false);
 		}
 		
@@ -427,6 +442,14 @@ public class ChatController implements PropertyChangeListener {
 	@FXML
 	private void sendMessage() {
 		String ip = activeIp;
+		Socket sock = convList.getSocket(ip);
+		sendTCP stcp = null;
+		try {
+			stcp = new sendTCP(sock);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		if (ip == null) {
 			System.out.println("Select a user to get his ip");
 		} else {
@@ -434,9 +457,9 @@ public class ChatController implements PropertyChangeListener {
 			if (text == null || text.equals("")) {
 				System.out.println("Empty Message");
 			} else {
-				MDB.addMessage(ip, true, text);
+				//MDB.addMessage(ip, true, text);
 				//send message
-				stcp.sendTextTCP(text);
+				stcp.sendTextTCP("text");
 				//display the message
 				String timestamp = Timestamp.formatDateTimeFull();
 				display(text, true, timestamp);
@@ -452,17 +475,37 @@ public class ChatController implements PropertyChangeListener {
 		label.setMinWidth(vbox.getMinWidth());
 		label.setMaxWidth(vbox.getMaxWidth());
 		label.setPrefWidth(vbox.getPrefWidth());
+		label.setWrapText(true);
+		label.setPadding(new Insets(5,5,5,5));
+		label.setOnMouseEntered(new EventHandler<MouseEvent>() {
+		    @Override public void handle(MouseEvent e) {
+		    	label.setScaleX(1.5);
+		    	label.setScaleY(1.5);
+		    }
+		});
+
+		label.setOnMouseExited(new EventHandler<MouseEvent>() {
+		    @Override public void handle(MouseEvent e) {
+		    	label.setScaleX(1);
+		    	label.setScaleY(1);
+		    }
+		});
+		Font font = Font.font("Arial", FontWeight.NORMAL, 13);
+        label.setFont(font);
 		String textToDisplay = null;
 		if (isSender) {
 			textToDisplay = msg + " : " + timestamp;
 			label.setAlignment(Pos.CENTER_RIGHT);
-			label.setBackground(new Background(new BackgroundFill(Color.CORNFLOWERBLUE, new CornerRadii(8), new Insets(16))));
+			label.setStyle("-fx-background-color: #0078FF; -fx-background-radius: 10px 10px 0px 10px;");
+			label.setTextFill(Color.web("#ffffff"));
+			
 		} else {
 			textToDisplay = timestamp + " : " + msg;
 			label.setAlignment(Pos.CENTER_LEFT);
-			label.setBackground(new Background(new BackgroundFill(Color.GREY, new CornerRadii(8), new Insets(16))));
+			label.setStyle("-fx-background-color: #dfe1ee; -fx-background-radius: 10px 10px 10px 0px;");
 		}
 		label.setText(textToDisplay);
+		
 		vbox.getChildren().add(label);
 	}
 	
