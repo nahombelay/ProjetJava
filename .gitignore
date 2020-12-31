@@ -2,3 +2,4 @@
 .DS_Store
 *.pdf
 POO/ChatSystem GUI/SQLiteDatabases/usersDatabase.db
+*.db

@@ -30,6 +30,7 @@ public class ConversationInput extends Thread {
 		this.messagesDB = messagesDB;
 		this.socketInput = socketInput;
 		ipDest = ((InetSocketAddress) socketInput.getRemoteSocketAddress()).toString().split("/")[1].split(":")[0];
+		System.out.println("[ConversationInput] Init done");
 	}
 	/**
 	 * At each input read, it prints it. 
@@ -37,6 +38,8 @@ public class ConversationInput extends Thread {
 	 * A AMELIORER
 	 */
 	public void run()  {
+		
+		System.out.println("[ConversationInput] in the thread");
 		
 		while(!stop) {
 			try {
@@ -52,6 +55,7 @@ public class ConversationInput extends Thread {
 				messagesDB.addMessage(ipDest, false, resp);
 				//send a signal to chat Controller
 				notifyListeners(ChatController.class, "incomingMSG", ipDest, resp);
+				System.out.println("[ConversationInput] Chat Controller Notified");
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

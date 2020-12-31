@@ -2,7 +2,10 @@ package chatSytem.view;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
@@ -328,7 +331,12 @@ public class ChatController implements PropertyChangeListener {
 
 	private void startConv(String ip, Socket sock) {
 		convList.addConv(ip, sock);
+		ConversationInput ci = new ConversationInput(sock, MDB);
+		activeCi = ci;
+		activeCi.addChangeListener(this);
+		activeCi.start();
 		System.out.println("Conv Started");
+		
 	}
 
 	private void incomingMSG(String ip, String msg) {
@@ -427,10 +435,10 @@ public class ChatController implements PropertyChangeListener {
 		} else {
 			sock = convList.getSocket(ip);
 		}
-		ConversationInput ci = new ConversationInput(sock, MDB);
-		activeCi = ci;
-		activeCi.addChangeListener(this);
-		activeCi.start();
+//		ConversationInput ci = new ConversationInput(sock, MDB);
+//		activeCi = ci;
+//		activeCi.addChangeListener(this);
+//		activeCi.start();
 		vbox.getChildren().clear();
 		displayHistory(ip);
 
@@ -457,30 +465,37 @@ public class ChatController implements PropertyChangeListener {
 		String ip = activeIp;
 		Socket sock = convList.getSocket(ip);
 		System.out.println(sock);
-		sendTCP stcp = null;
+		//sendTCP stcp = null;
+		OutputStream out = null;
 		try {
-			stcp = new sendTCP(sock);
+			out = sock.getOutputStream();
+			//stcp = new sendTCP(sock);
+			if (ip == null) {
+				System.out.println("Select a user to get his ip");
+			} else {
+				String text = textArea.getText();
+				if (text == null || text.equals("")) {
+					System.out.println("Empty Message");
+				} else {
+					MDB.addMessage(ip, true, text);
+					//send message
+					//stcp.sendTextTCP(text);
+					out.write(text.getBytes());
+					PrintWriter writer = new PrintWriter(out, true);
+					writer.println("This is a message sent to the server");
+					//display the message
+					String timestamp = Timestamp.formatDateTimeFull();
+					display(text, true, timestamp);
+					textArea.setText("");
+				}
+				
+			}
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if (ip == null) {
-			System.out.println("Select a user to get his ip");
-		} else {
-			String text = textArea.getText();
-			if (text == null || text.equals("")) {
-				System.out.println("Empty Message");
-			} else {
-				MDB.addMessage(ip, true, text);
-				//send message
-				stcp.sendTextTCP(text);
-				//display the message
-				String timestamp = Timestamp.formatDateTimeFull();
-				display(text, true, timestamp);
-				textArea.setText("");
-			}
-			
-		}
+		
 		
 	}
 	
