@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -67,8 +68,7 @@ public class MessagesDB  {
 		}
 	}
 	
-	public List<ArrayList<String>> getMessages(String ipDest) {
-		List<ArrayList<String>> array = new ArrayList<ArrayList<String>>();
+	public ArrayList<ArrayList<String>> getMessages(String ipDest) {
 		ArrayList<String> textArray = new ArrayList<String>();
 		ArrayList<String> timeArray = new ArrayList<String>();
 		ArrayList<String> posArray = new ArrayList<String>();
@@ -79,21 +79,23 @@ public class MessagesDB  {
 			pstm = c.prepareStatement(query);
 			pstm.setString(1, ipDest);
 			rs = pstm.executeQuery();
-			while (rs.next()) {
-				String text = rs.getString(1);
-				String time = rs.getString(2);
-				
-				if (rs.getBoolean(3) == true) {
-					isSender = "true";
-				} else {
-					isSender = "false";
+			if (rs != null) {
+				while (rs.next()) {
+					String text = rs.getString(1);
+					String time = rs.getString(2);
+					
+					if (rs.getBoolean(3) == true) {
+						isSender = "true";
+					} else {
+						isSender = "false";
+					}
+					textArray.add(text);
+					timeArray.add(time);
+					posArray.add(isSender);
 				}
-				textArray.add(text);
-				timeArray.add(time);
-				posArray.add(isSender);
+				rs.close();
+				pstm.close();
 			}
-			rs.close();
-			pstm.close();
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -102,8 +104,10 @@ public class MessagesDB  {
 		if(textArray.size() == 0) {
 			return null;
 		} else {
-			array.set(0, textArray);
-			array.set(1, timeArray);
+			ArrayList<ArrayList<String>> array = new ArrayList<ArrayList<String>>();
+			array.add(textArray);
+			array.add(timeArray);
+			array.add(posArray);
 			return array;
 		}
 		

@@ -43,13 +43,13 @@ public class ListenSocket extends Thread {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			ConversationInput ci = new ConversationInput(socketConversation, messagesDB);
-			ConversationOutput co = new ConversationOutput(socketConversation, messagesDB);
-	        ci.start();
-	        co.start();
+			//ConversationInput ci = new ConversationInput(socketConversation, messagesDB);
+			//ConversationOutput co = new ConversationOutput(socketConversation, messagesDB);
+	        //ci.start();
+	        //co.start();
 	      }
-		ConversationInput.stop = true;
-		ConversationOutput.stop = true;
+		//ConversationInput.stop = true;
+		//ConversationOutput.stop = true;
 		System.out.println("[ListenSocket] End of Thread");
 		
 	}
