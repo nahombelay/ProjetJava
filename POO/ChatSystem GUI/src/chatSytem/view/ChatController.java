@@ -5,18 +5,17 @@ import java.beans.PropertyChangeListener;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 import chatSytem.Main;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -36,15 +35,11 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -61,7 +56,7 @@ public class ChatController implements PropertyChangeListener {
 	private VBox vbox;
 	
 	@FXML
-	private AnchorPane chatPane;
+	private ScrollPane chatPane;
 	
 	@FXML
 	private Button endConvoButton;
@@ -149,6 +144,7 @@ public class ChatController implements PropertyChangeListener {
 		MainSocket mainSock = new MainSocket();
 		this.serverSocket = mainSock.getSocketServeur();
 		ListenSocket listenSock = new ListenSocket(serverSocket, MDB);
+		listenSock.addChangeListener(this);
 		listenSock.start();
 	}
 	
@@ -227,25 +223,25 @@ public class ChatController implements PropertyChangeListener {
     }
 	
 	//Method to display and hide chooseUser, endConvoButton and button bar
-	public void conversationOpen(boolean isOpen) {
+	private void conversationOpen(boolean isOpen) {
 		conversationWith.setVisible(isOpen);
 		endConvoButton.setVisible(isOpen);
 		chooseUser.setVisible(!isOpen);
 		buttonBar.setVisible(isOpen);
 	}
 	
-	public void updateConvoWithLabel(String user) {
+	private void updateConvoWithLabel(String user) {
 		conversationWith.setText("Conversation with " + user);
 		conversationWith.setVisible(true);
 	}
 	
-	public void updateDateLabel(String date) {
+	private void updateDateLabel(String date) {
 		dateLabel.setText("Date : " + date);
 		dateLabel.setVisible(true);
 	}
 	
 	@FXML
-	public void aboutSection() {
+	private void aboutSection() {
         a.setAlertType(AlertType.INFORMATION); 
         a.setTitle("About");
         a.setHeaderText("Created by Nahom Belay & Florian Leon");
@@ -254,7 +250,7 @@ public class ChatController implements PropertyChangeListener {
 	}
 	
 	@FXML
-	public void switchToOnline() throws Exception {
+	private void switchToOnline() throws Exception {
 		System.out.println("Online");
 		String location = ConnexionController.toogleGroupValue;
 		if (location.equals("Intern")) {
@@ -269,7 +265,7 @@ public class ChatController implements PropertyChangeListener {
 	}
 	
 	@FXML
-	public void switchToDND() throws Exception {
+	private void switchToDND() throws Exception {
 		System.out.println("Do Not Disturb");
 		String location = ConnexionController.toogleGroupValue;
 		if (location.equals("Intern")) {
@@ -284,7 +280,7 @@ public class ChatController implements PropertyChangeListener {
 	}
 	
 	@FXML
-	public void switchToOffline() throws Exception {
+	private void switchToOffline() throws Exception {
 		System.out.println("Offline");
 		String location = ConnexionController.toogleGroupValue;
 		if (location.equals("Intern")) {
@@ -299,13 +295,13 @@ public class ChatController implements PropertyChangeListener {
 	}
 	
 	@FXML
-	public void changeUsernameHandler() throws IOException {
+	private void changeUsernameHandler() throws IOException {
 		Main.showChangeUsernameLayout();
 	}
 
 	//NE marche pas encore : regarder https://stackoverflow.com/questions/12153622/how-to-close-a-javafx-application-on-window-close 
 	@FXML
-	public void quitHandler() {
+	private void quitHandler() {
 		//TODO : il faut arreter le reste aussi je suppose pas que faire ca 
 		Main.user.close();
 		Platform.exit();
@@ -335,9 +331,16 @@ public class ChatController implements PropertyChangeListener {
 
 	private void startConv(String ip, Socket sock) {
 		convList.addConv(ip, sock);
+		ConversationInput ci = new ConversationInput(sock, MDB);
+		activeCi = ci;
+		activeCi.addChangeListener(this);
+		activeCi.start();
+		System.out.println("Conv Started");
+		
 	}
 
 	private void incomingMSG(String ip, String msg) {
+		//MDB.addMessage(ip, false, msg);
 		//look if the conversation is active
 		boolean test = activeIp.equals(ip);
 		System.out.println(test);
@@ -432,12 +435,12 @@ public class ChatController implements PropertyChangeListener {
 		} else {
 			sock = convList.getSocket(ip);
 		}
-		ConversationInput ci = new ConversationInput(sock, MDB);
-		activeCi = ci;
-		activeCi.addChangeListener(this);
-		activeCi.start();
-
-		//displayHistory(ip);
+//		ConversationInput ci = new ConversationInput(sock, MDB);
+//		activeCi = ci;
+//		activeCi.addChangeListener(this);
+//		activeCi.start();
+		vbox.getChildren().clear();
+		displayHistory(ip);
 
 	}
 
@@ -462,30 +465,37 @@ public class ChatController implements PropertyChangeListener {
 		String ip = activeIp;
 		Socket sock = convList.getSocket(ip);
 		System.out.println(sock);
-		sendTCP stcp = null;
+		//sendTCP stcp = null;
+		OutputStream out = null;
 		try {
-			stcp = new sendTCP(sock);
+			out = sock.getOutputStream();
+			//stcp = new sendTCP(sock);
+			if (ip == null) {
+				System.out.println("Select a user to get his ip");
+			} else {
+				String text = textArea.getText();
+				if (text == null || text.equals("")) {
+					System.out.println("Empty Message");
+				} else {
+					MDB.addMessage(ip, true, text);
+					//send message
+					//stcp.sendTextTCP(text);
+					out.write(text.getBytes());
+					PrintWriter writer = new PrintWriter(out, true);
+					writer.println("This is a message sent to the server");
+					//display the message
+					String timestamp = Timestamp.formatDateTimeFull();
+					display(text, true, timestamp);
+					textArea.setText("");
+				}
+				
+			}
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if (ip == null) {
-			System.out.println("Select a user to get his ip");
-		} else {
-			String text = textArea.getText();
-			if (text == null || text.equals("")) {
-				System.out.println("Empty Message");
-			} else {
-				//MDB.addMessage(ip, true, text);
-				//send message
-				stcp.sendTextTCP("text");
-				//display the message
-				String timestamp = Timestamp.formatDateTimeFull();
-				display(text, true, timestamp);
-				textArea.setText("");
-			}
-			
-		}
+		
 		
 	}
 	
@@ -496,41 +506,25 @@ public class ChatController implements PropertyChangeListener {
 		label.setPrefWidth(vbox.getPrefWidth());
 		label.setWrapText(true);
 		label.setPadding(new Insets(5,5,5,5));
-		label.setOnMouseEntered(new EventHandler<MouseEvent>() {
-		    @Override public void handle(MouseEvent e) {
-		    	label.setScaleX(1.5);
-		    	label.setScaleY(1.5);
-		    }
-		});
-
-		label.setOnMouseExited(new EventHandler<MouseEvent>() {
-		    @Override public void handle(MouseEvent e) {
-		    	label.setScaleX(1);
-		    	label.setScaleY(1);
-		    }
-		});
-		Font font = Font.font("Arial", FontWeight.NORMAL, 13);
-        label.setFont(font);
+        label.setFont(Font.font("Arial", FontWeight.NORMAL, 13));
 		String textToDisplay = null;
 		if (isSender) {
 			textToDisplay = msg + " : " + timestamp;
 			label.setAlignment(Pos.CENTER_RIGHT);
 			label.setStyle("-fx-background-color: #0078FF; -fx-background-radius: 10px 10px 0px 10px;");
 			label.setTextFill(Color.web("#ffffff"));
-			
 		} else {
 			textToDisplay = timestamp + " : " + msg;
 			label.setAlignment(Pos.CENTER_LEFT);
 			label.setStyle("-fx-background-color: #dfe1ee; -fx-background-radius: 10px 10px 10px 0px;");
 		}
 		label.setText(textToDisplay);
-		
 		vbox.getChildren().add(label);
+		//chatPane.setHvalue(0);
 	}
 	
-	
 	private void displayHistory(String ip) {
-		List<ArrayList<String>> array = MDB.getMessages(ip);
+		ArrayList<ArrayList<String>> array = MDB.getMessages(ip);
 		if (array != null) {
 			ArrayList<String> textArray = array.get(0);
 			ArrayList<String> timeArray = array.get(1);

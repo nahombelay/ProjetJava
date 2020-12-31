@@ -15,7 +15,6 @@ public class User {
 	private ActiveUsersDB activeUsers;
 	private InetAddress ip;
 	private String ipString; 
-	private ServerSocket mainSocket;
 	private MessagesDB messageDB;
 
 	public User() {
@@ -23,7 +22,6 @@ public class User {
 		this.settingIPInfo();
 		this.initialisation();
 		this.threadUDP();
-		//this.threadTCP();
 	
 	}
 	
@@ -83,15 +81,6 @@ public class User {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	/**
-	 * Manage all conversation of the user
-	 */
-	private void threadTCP() {
-		MainSocket mainSock = new MainSocket();
-		this.mainSocket = mainSock.getSocketServeur();
-		ListenSocket listenSock = new ListenSocket(mainSocket, messageDB);
-		listenSock.start();
 	}
 	
 	public boolean changeUsername(String username) throws UnknownHostException, IOException {
