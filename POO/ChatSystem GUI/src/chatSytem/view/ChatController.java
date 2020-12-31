@@ -505,9 +505,8 @@ public class ChatController implements PropertyChangeListener {
 		}
 		label.setText(textToDisplay);
 		vbox.getChildren().add(label);
-		chatPane.setHvalue(0);
+		//chatPane.setHvalue(0);
 	}
-	
 	
 	private void displayHistory(String ip) {
 		ArrayList<ArrayList<String>> array = MDB.getMessages(ip);
