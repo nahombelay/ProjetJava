@@ -66,6 +66,53 @@ public class UsersDatabaseServer {
 		}
 	}
 	
+	public void deleteUser(String sessionID) {
+
+		String table = "";
+		if (isInTable(sessionID, "InternalUsers")) {
+			table = "InternalUsers";
+		} else if (isInTable(sessionID, "ExternalUsers")) {
+			table = "ExternalUsers";
+		}
+		
+		String query = "DELETE FROM " + table + " WHERE sessionID = ?;";
+		
+		try {
+			this.pstm = c.prepareStatement(query);
+			this.pstm.setString(1, sessionID);
+			this.rowsModified = pstm.executeUpdate();
+			this.pstm.close();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean isInTable(String sessionID, String table) {
+		boolean isPresent;
+		int count = 0;
+		String query = "SELECT COUNT(1) FROM " + table + " WHERE sessionID = '" + sessionID + "';";
+
+		try {
+			this.stm = c.createStatement();
+			this.rs = stm.executeQuery(query);
+			
+			while(rs.next()) {
+				count = rs.getInt(1);
+			}
+			
+			stm.close();
+			rs.close();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		isPresent = (count == 1);
+		return isPresent;
+	}
 	public void updateUser(String ip, String username, String status, String sessionID, String table) {
 		String query = "UPDATE " + table + " SET username = ?, status = ? WHERE ip = ? OR sessionID = ?;";
 		
@@ -110,7 +157,6 @@ public class UsersDatabaseServer {
 	}
 	public static void main (String [] agrv) {
 		UsersDatabaseServer db = new UsersDatabaseServer();
-		System.out.println(db.getSessionId("1.1.1.1", "InternalUsers"));
 		
 	}
 }

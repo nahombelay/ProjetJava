@@ -34,18 +34,18 @@ public class WebSocketListenUsers {
 	public void onCreateSession(Session session) {
 		this.session = session;
 		clients.put(session.getId(),session);
-		//TODO: send all users info
+		System.out.println("New User added to clients. SessionID = " + session.getId());
 	}
 	
 	@OnMessage
 	public void onTextMessage(String message, Session session) {
-		System.out.println("Message = " + message + " par session: " + session.getId());
+		
 		if(this.session != null & this.session.isOpen()) {
-			
+			//System.out.println("Message = " + message + " par session: " + session.getId());
 			UsersDatabaseServer db = new UsersDatabaseServer();
 			
+			String [] formatedMessage = message.split(":");;
 			
-			String [] formatedMessage = messageType(message);
 			if (formatedMessage[0].equals("[NewUser]")) {
 				//format: [NewUser]:ip:username:status:internal/external
 				db.addUser(formatedMessage[1], formatedMessage[2], formatedMessage[3], session.getId(), formatedMessage[4]);
@@ -56,16 +56,18 @@ public class WebSocketListenUsers {
 					e.printStackTrace();
 				}
 				
-				String userInfo = formatedMessage[1] + ":" + formatedMessage[2] + ":" + formatedMessage[3];
+				String userInfo = "[NewUser]" +formatedMessage[1] + ":" + formatedMessage[2] + ":" + formatedMessage[3];
 				broadcastUserInfo(db, userInfo, formatedMessage[4]);
 				
 				String HTMLTable = usersHTMLTable(db, formatedMessage[4]);
 				try {
+					System.out.println(HTMLTable);
 					session.getBasicRemote().sendText(HTMLTable);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
 			} else if (formatedMessage[0].equals("[UserUpdate]")) {
 				if (formatedMessage[3].contentEquals("offline")) {
 					db.deleteUser(formatedMessage[1], formatedMessage[2], session.getId(), formatedMessage[4]);
@@ -73,10 +75,11 @@ public class WebSocketListenUsers {
 					db.updateUser(formatedMessage[1], formatedMessage[2], formatedMessage[3], session.getId(), formatedMessage[4]);
 				}
 
-				String userInfo = formatedMessage[1] + ":" + formatedMessage[2] + ":" + formatedMessage[3];
+				String userInfo = "[UserUpdate]" + formatedMessage[1] + ":" + formatedMessage[2] + ":" + formatedMessage[3];
 				broadcastUserInfo(db, userInfo, formatedMessage[4]);
 				
 			} else if (formatedMessage[0].equals("[Forward]")) {
+				System.out.println("Forwarding from " + formatedMessage[1] + " to " + formatedMessage[2]);
 				String messageToBeForwarded = "[Forwarded]:" + formatedMessage[1] + ":" + formatedMessage[3];
 				if (formatedMessage[4].equals("InternalUsers")) {
 					forwardMessage(db, formatedMessage[2] , formatedMessage[1] , "ExternalUsers", messageToBeForwarded);
@@ -93,11 +96,7 @@ public class WebSocketListenUsers {
 	public void onClose(Session session) {
 		System.out.println("Closed");
 		clients.remove(session.getId(), session);
-	}
-	
-	public String[] messageType(String message) {
-		String[] info = message.split(":");
-		return info;
+		
 	}
 	
 	public void broadcastUserInfo(UsersDatabaseServer db, String userInfo, String table) {
@@ -150,7 +149,12 @@ public class WebSocketListenUsers {
 	}
 	
 	public String usersHTMLTable(UsersDatabaseServer db, String table) {
-		String HTMLTable = "";
+		String HTMLTable = "<table >\n" + 
+				"			<tr>\n" + 
+				"				<th>ip</th>\n" + 
+				"				<th>username</th>\n" + 
+				"				<th>status</th>\n" + 
+				"			</tr>";
 		Connection c = db.getConnection("ExternalUsers");
 		ResultSet rs;
 		try {
@@ -161,14 +165,13 @@ public class WebSocketListenUsers {
 				String username = rs.getString(2);
 				String status = rs.getString(3);
 				
-				HTMLTable.concat("<tr>");
-				HTMLTable.concat("<td> " + ip + "</td>");
-				HTMLTable.concat("<td> " + username + "</td>");
-				HTMLTable.concat("<td> " + status + "</td>");
-				HTMLTable.concat("</tr>");
+				HTMLTable += ("<tr>");
+				HTMLTable += ("<td> " + ip + "</td>");
+				HTMLTable += ("<td> " + username + "</td>");
+				HTMLTable += ("<td> " + status + "</td>");
+				HTMLTable += ("</tr>");
 			}
-			
-			c.close();
+
 			rs.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -186,11 +189,11 @@ public class WebSocketListenUsers {
 					String username = rs.getString(2);
 					String status = rs.getString(3);
 					
-					HTMLTable.concat("<tr>");
-					HTMLTable.concat("<td> " + ip + "</td>");
-					HTMLTable.concat("<td> " + username + "</td>");
-					HTMLTable.concat("<td> " + status + "</td>");
-					HTMLTable.concat("</tr>");
+					HTMLTable += ("<tr>");
+					HTMLTable += ("<td> " + ip + "</td>");
+					HTMLTable += ("<td> " + username + "</td>");
+					HTMLTable += ("<td> " + status + "</td>");
+					HTMLTable += ("</tr>");
 				}
 				
 				c.close();

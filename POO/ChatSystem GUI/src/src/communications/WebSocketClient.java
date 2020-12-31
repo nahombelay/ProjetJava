@@ -51,7 +51,7 @@ public class WebSocketClient extends Endpoint{
 			e.printStackTrace();
 		}
 		try {
-			endpoint.sendMessage("Hello From Client");
+			endpoint.sendMessage("[NewUser]:1.1.2.1:titi:online:InternalUsers");
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
