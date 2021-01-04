@@ -430,15 +430,16 @@ public class ChatController implements PropertyChangeListener {
 		updateDateLabel(Timestamp.formatDateTime());
 		Socket sock = null;
 		if (!convList.hasKey(ip)) {
+			System.out.println("No key found");
 			sock = conv.getSocket();
 			convList.addConv(ip, sock);
 		} else {
 			sock = convList.getSocket(ip);
 		}
-//		ConversationInput ci = new ConversationInput(sock, MDB);
-//		activeCi = ci;
-//		activeCi.addChangeListener(this);
-//		activeCi.start();
+		ConversationInput ci = new ConversationInput(sock, MDB);
+		activeCi = ci;
+		activeCi.addChangeListener(this);
+		activeCi.start();
 		vbox.getChildren().clear();
 		displayHistory(ip);
 
@@ -483,9 +484,10 @@ public class ChatController implements PropertyChangeListener {
 					//System.out.println(text.getBytes());
 					//out.write(text.getBytes());
 					//out.write(Charset.getDefaultCharset().encode("Hello, world!"));
-					PrintWriter writer = new PrintWriter(out, true);
-					writer.println(text);
+					PrintWriter writer = new PrintWriter(out);
+					//writer.println(text);
 					writer.write(text);
+					writer.flush();
 					//display the message
 					String timestamp = Timestamp.formatDateTimeFull();
 					display(text, true, timestamp);
