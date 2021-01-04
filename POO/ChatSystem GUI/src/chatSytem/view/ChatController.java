@@ -117,6 +117,7 @@ public class ChatController implements PropertyChangeListener {
 	
 	private ServerSocket serverSocket;
 	
+	private Socket socket;
 	
 	Alert a = new Alert(AlertType.NONE); 
 	
@@ -437,6 +438,7 @@ public class ChatController implements PropertyChangeListener {
 			sock = convList.getSocket(ip);
 		}
 		ConversationInput ci = new ConversationInput(sock, MDB);
+		socket = sock;
 		activeCi = ci;
 		activeCi.addChangeListener(this);
 		activeCi.start();
@@ -465,6 +467,7 @@ public class ChatController implements PropertyChangeListener {
 	private void sendMessage() {
 		String ip = activeIp;
 		Socket sock = convList.getSocket(ip);
+		sock = socket;
 		System.out.println(sock.toString());
 		//sendTCP stcp = null;
 		OutputStream out = null;
@@ -486,8 +489,9 @@ public class ChatController implements PropertyChangeListener {
 					//out.write(Charset.getDefaultCharset().encode("Hello, world!"));
 					PrintWriter writer = new PrintWriter(out);
 					//writer.println(text);
-					writer.write(text);
+					writer.write(text + "\n");
 					writer.flush();
+					sock.close();
 					//display the message
 					String timestamp = Timestamp.formatDateTimeFull();
 					display(text, true, timestamp);
