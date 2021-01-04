@@ -117,7 +117,7 @@ public class ChatController implements PropertyChangeListener {
 	
 	private ServerSocket serverSocket;
 	
-	private Socket socket;
+	//private Socket socket;
 	
 	Alert a = new Alert(AlertType.NONE); 
 	
@@ -424,21 +424,23 @@ public class ChatController implements PropertyChangeListener {
 	private void startConnexion(Login login) {
 		String ip = login.getIp();
 		this.activeIp = ip;
-		InitiateConversation conv = new InitiateConversation(ip, MDB);
-		conv.start();
-		conversationOpen(true);
-		updateConvoWithLabel(login.getLogin());
-		updateDateLabel(Timestamp.formatDateTime());
+		
 		Socket sock = null;
 		if (!convList.hasKey(ip)) {
 			System.out.println("No key found");
+			InitiateConversation conv = new InitiateConversation(ip, MDB);
+			conv.start();
+			conversationOpen(true);
+			updateConvoWithLabel(login.getLogin());
+			updateDateLabel(Timestamp.formatDateTime());
 			sock = conv.getSocket();
 			convList.addConv(ip, sock);
 		} else {
 			sock = convList.getSocket(ip);
+			
 		}
 		ConversationInput ci = new ConversationInput(sock, MDB);
-		socket = sock;
+		//socket = sock;
 		activeCi = ci;
 		activeCi.addChangeListener(this);
 		activeCi.start();
@@ -467,7 +469,7 @@ public class ChatController implements PropertyChangeListener {
 	private void sendMessage() {
 		String ip = activeIp;
 		Socket sock = convList.getSocket(ip);
-		sock = socket;
+		//sock = socket;
 		System.out.println(sock.toString());
 		//sendTCP stcp = null;
 		OutputStream out = null;
@@ -481,17 +483,11 @@ public class ChatController implements PropertyChangeListener {
 				if (text == null || text.equals("")) {
 					System.out.println("Empty Message");
 				} else {
-					//MDB.addMessage(ip, true, text);
+					MDB.addMessage(ip, true, text);
 					//send message
-					//stcp.sendTextTCP(text);
-					//System.out.println(text.getBytes());
-					//out.write(text.getBytes());
-					//out.write(Charset.getDefaultCharset().encode("Hello, world!"));
 					PrintWriter writer = new PrintWriter(out);
-					//writer.println(text);
 					writer.write(text + "\n");
 					writer.flush();
-					sock.close();
 					//display the message
 					String timestamp = Timestamp.formatDateTimeFull();
 					display(text, true, timestamp);
