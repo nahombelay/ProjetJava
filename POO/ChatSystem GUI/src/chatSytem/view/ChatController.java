@@ -424,15 +424,14 @@ public class ChatController implements PropertyChangeListener {
 	private void startConnexion(Login login) {
 		String ip = login.getIp();
 		this.activeIp = ip;
-		
+		conversationOpen(true);
+		updateConvoWithLabel(login.getLogin());
+		updateDateLabel(Timestamp.formatDateTime());
 		Socket sock = null;
 		if (!convList.hasKey(ip)) {
 			System.out.println("No key found");
 			InitiateConversation conv = new InitiateConversation(ip, MDB);
 			conv.start();
-			conversationOpen(true);
-			updateConvoWithLabel(login.getLogin());
-			updateDateLabel(Timestamp.formatDateTime());
 			sock = conv.getSocket();
 			convList.addConv(ip, sock);
 		} else {
@@ -458,8 +457,9 @@ public class ChatController implements PropertyChangeListener {
 		} else {
 			Socket sock = convList.getSocket(ip);
 			convList.removeConv(ip, sock);
-			sock.close();
-			//activeCi.stop = true;
+			textArea.setText(null);
+			sendMessage();
+			textArea.setText("");
 			conversationOpen(false);
 		}
 		
@@ -480,7 +480,7 @@ public class ChatController implements PropertyChangeListener {
 				System.out.println("Select a user to get his ip");
 			} else {
 				String text = textArea.getText();
-				if (text == null || text.equals("")) {
+				if (text.equals("")) {
 					System.out.println("Empty Message");
 				} else {
 					MDB.addMessage(ip, true, text);
