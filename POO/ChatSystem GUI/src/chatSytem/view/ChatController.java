@@ -464,7 +464,7 @@ public class ChatController implements PropertyChangeListener {
 	private void sendMessage() {
 		String ip = activeIp;
 		Socket sock = convList.getSocket(ip);
-		System.out.println(sock);
+		System.out.println(sock.toString());
 		//sendTCP stcp = null;
 		OutputStream out = null;
 		try {
@@ -477,12 +477,15 @@ public class ChatController implements PropertyChangeListener {
 				if (text == null || text.equals("")) {
 					System.out.println("Empty Message");
 				} else {
-					MDB.addMessage(ip, true, text);
+					//MDB.addMessage(ip, true, text);
 					//send message
 					//stcp.sendTextTCP(text);
-					out.write(text.getBytes());
+					//System.out.println(text.getBytes());
+					//out.write(text.getBytes());
+					//out.write(Charset.getDefaultCharset().encode("Hello, world!"));
 					PrintWriter writer = new PrintWriter(out, true);
-					writer.println("This is a message sent to the server");
+					writer.println(text);
+					writer.write(text);
 					//display the message
 					String timestamp = Timestamp.formatDateTimeFull();
 					display(text, true, timestamp);
