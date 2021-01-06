@@ -117,6 +117,8 @@ public class ChatController implements PropertyChangeListener {
 	
 	private ServerSocket serverSocket;
 	
+	private final String location = ConnexionController.toogleGroupValue;
+	
 	//private Socket socket;
 	
 	Alert a = new Alert(AlertType.NONE); 
@@ -126,7 +128,12 @@ public class ChatController implements PropertyChangeListener {
 	
 	@FXML
 	private void initialize() throws ClassNotFoundException, SQLException, IOException {
-        activeUsers = Main.user.getActiveUsers();
+		if (location.equals("Intern")) {
+			activeUsers = Main.user.getActiveUsers();
+		} else {
+			activeUsers = Main.externalUser.getActiveUsers();
+		}
+        
         activeUsers.addChangeListener(this);
         list = activeUsers.getAllUsers();
 		for(Login l : list) {
@@ -303,8 +310,13 @@ public class ChatController implements PropertyChangeListener {
 	//NE marche pas encore : regarder https://stackoverflow.com/questions/12153622/how-to-close-a-javafx-application-on-window-close 
 	@FXML
 	private void quitHandler() {
-		//TODO : il faut arreter le reste aussi je suppose pas que faire ca 
-		Main.user.close();
+		//TODO : il faut arreter le reste aussi je suppose pas que faire ca
+		if (location.equals("Intern")) {
+			Main.user.close();
+		} else {
+			//Main.externalUser.close();
+		}
+		
 		Platform.exit();
 		//Main.closeStage();
 	}
@@ -407,8 +419,12 @@ public class ChatController implements PropertyChangeListener {
 
 
 	private void newUserHandler(String ip, String username) {
-
-		  activeUsers = Main.user.getActiveUsers(); 
+		if (location.equals("Intern")) {
+			activeUsers = Main.user.getActiveUsers(); 
+		} else {
+			activeUsers = Main.externalUser.getActiveUsers(); 
+		}
+		  
 		  try { 
 			  list = activeUsers.getAllUsers(); 
 			  addUser(list.get(list.size()-1));

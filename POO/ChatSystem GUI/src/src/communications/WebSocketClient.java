@@ -4,6 +4,7 @@ package src.communications;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.ContainerProvider;
@@ -11,11 +12,17 @@ import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
+import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
+import org.jsoup.select.Elements;
+
+import src.database.ActiveUsersDB;
+import src.scrapper.HTMLscrapper;
+
 @ClientEndpoint
-public class WebSocketClient extends Endpoint{
+public class WebSocketClient extends Endpoint {
 
 	private Session session;
 	
@@ -36,6 +43,42 @@ public class WebSocketClient extends Endpoint{
 	
 	public void sendMessage(String message) throws IOException {
 		this.session.getBasicRemote().sendText(message);
+	}
+	
+	public void pingServer(ByteBuffer buffer) {
+		try {
+			this.session.getBasicRemote().sendPing(buffer);
+		} catch (IllegalArgumentException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	@OnMessage
+	public void onTextMessage(String message, Session session) {
+		ActiveUsersDB usersDatabase = new ActiveUsersDB();
+		if (message.substring(0,6).equals("<table>")) {
+			HTMLscrapper hc = new HTMLscrapper(message);
+			Elements e = hc.getTable();
+			hc.addRowsToDatabase(e);
+		}
+		
+		else if (message.substring(0, 12).equals("[UserUpdate]")) {
+			String [] formatedMessage = message.split(":");
+			String ip = formatedMessage[1];
+			String username = formatedMessage[2];
+			String status = formatedMessage[3];
+			usersDatabase.addUser(ip, username);
+			try {
+				usersDatabase.changeStatus(username, status);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		//TODO: if message is textmessage
+		
+	
 	}
 	
 	public static void main (String[] argv) {

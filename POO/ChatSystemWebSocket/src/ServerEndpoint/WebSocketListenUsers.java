@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,7 +29,7 @@ public class WebSocketListenUsers {
 	private Session session;
 	private static Map<String,Session> clients = 
 		    Collections.synchronizedMap(new HashMap<String,Session>());
-
+	private UsersDatabaseServer db = new UsersDatabaseServer();
 	
 	@OnOpen
 	public void onCreateSession(Session session) {
@@ -42,13 +43,12 @@ public class WebSocketListenUsers {
 		
 		if(this.session != null & this.session.isOpen()) {
 			//System.out.println("Message = " + message + " par session: " + session.getId());
-			UsersDatabaseServer db = new UsersDatabaseServer();
+			
 			
 			String [] formatedMessage = message.split(":");;
 			
 			if (formatedMessage[0].equals("[NewUser]")) {
 				//format: [NewUser]:ip:username:status:internal/external
-				db.addUser(formatedMessage[1], formatedMessage[2], formatedMessage[3], session.getId(), formatedMessage[4]);
 				try {
 					this.session.getBasicRemote().sendText("From Server: User has been added");
 				} catch (IOException e) {
@@ -68,14 +68,27 @@ public class WebSocketListenUsers {
 					e.printStackTrace();
 				}
 				
+				db.addUser(formatedMessage[1], formatedMessage[2], formatedMessage[3], session.getId(), formatedMessage[4]);
+				
 			} else if (formatedMessage[0].equals("[UserUpdate]")) {
-				if (formatedMessage[3].contentEquals("offline")) {
+				if (formatedMessage[2].contentEquals("offline")) {
 					db.deleteUser(formatedMessage[1], formatedMessage[2], session.getId(), formatedMessage[4]);
 				} else {
 					db.updateUser(formatedMessage[1], formatedMessage[2], formatedMessage[3], session.getId(), formatedMessage[4]);
 				}
 
-				String userInfo = "[UserUpdate]" + formatedMessage[1] + ":" + formatedMessage[2] + ":" + formatedMessage[3];
+				String userInfo = "[UserUpdate]" + formatedMessage[1] + ":" + formatedMessage[2];
+				broadcastUserInfo(db, userInfo, formatedMessage[4]);
+				
+			} else if (formatedMessage[0].equals("[UserUpdate]")) {
+				//format [UserUpdate]:ip:username:status
+				if (formatedMessage[2].contentEquals("Offline")) {
+					db.deleteUser(formatedMessage[1], formatedMessage[2], session.getId(), formatedMessage[4]);
+				} else {
+					db.updateUser(formatedMessage[1], formatedMessage[2], formatedMessage[3], session.getId(), formatedMessage[4]);
+				}
+
+				String userInfo = "[UserUpdate]" + formatedMessage[1] + ":" + formatedMessage[2];
 				broadcastUserInfo(db, userInfo, formatedMessage[4]);
 				
 			} else if (formatedMessage[0].equals("[Forward]")) {
@@ -149,60 +162,48 @@ public class WebSocketListenUsers {
 	}
 	
 	public String usersHTMLTable(UsersDatabaseServer db, String table) {
-		String HTMLTable = "<table >\n" + 
+		String HTMLTable = "<table>\n" + 
 				"			<tr>\n" + 
 				"				<th>ip</th>\n" + 
 				"				<th>username</th>\n" + 
 				"				<th>status</th>\n" + 
 				"			</tr>";
-		Connection c = db.getConnection("ExternalUsers");
-		ResultSet rs;
-		try {
-			rs = c.createStatement().executeQuery("SELECT * FROM ExternalUsers");
 
-			while (rs.next()) {
-				String ip = rs.getString(1);
-				String username = rs.getString(2);
-				String status = rs.getString(3);
-				
+		ArrayList<ArrayList<String>> array = new ArrayList<ArrayList<String>>();
+		array = db.createTable("ExternalUsers");
+		
+		if (array != null) {
+			ArrayList<String> ipArray = array.get(0);
+			ArrayList<String> usernameArray = array.get(1);
+			ArrayList<String> statusArray = array.get(2);
+			int size = ipArray.size();
+			for (int i = 0 ; i < size ; i++) {
 				HTMLTable += ("<tr>");
-				HTMLTable += ("<td> " + ip + "</td>");
-				HTMLTable += ("<td> " + username + "</td>");
-				HTMLTable += ("<td> " + status + "</td>");
+				HTMLTable += ("<td> " + ipArray.get(i) + "</td>");
+				HTMLTable += ("<td> " + usernameArray.get(i) + "</td>");
+				HTMLTable += ("<td> " + statusArray.get(i) + "</td>");
 				HTMLTable += ("</tr>");
 			}
-
-			rs.close();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
-		
 		if (table.equals("ExternalUsers")) {
-			c = db.getConnection("InternalUsers");
-			try {
-				rs = c.createStatement().executeQuery("SELECT * FROM ExternalUsers");
-
-				while (rs.next()) {
-					String ip = rs.getString(1);
-					String username = rs.getString(2);
-					String status = rs.getString(3);
-					
+			array = db.createTable("InternalUsers");
+			
+			if (array != null) {
+				ArrayList<String> ipArray = array.get(0);
+				ArrayList<String> usernameArray = array.get(1);
+				ArrayList<String> statusArray = array.get(2);
+				int size = ipArray.size();
+				for (int i = 0 ; i < size ; i++) {
 					HTMLTable += ("<tr>");
-					HTMLTable += ("<td> " + ip + "</td>");
-					HTMLTable += ("<td> " + username + "</td>");
-					HTMLTable += ("<td> " + status + "</td>");
+					HTMLTable += ("<td> " + ipArray.get(i) + "</td>");
+					HTMLTable += ("<td> " + usernameArray.get(i) + "</td>");
+					HTMLTable += ("<td> " + statusArray.get(i) + "</td>");
 					HTMLTable += ("</tr>");
 				}
-				
-				c.close();
-				rs.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 		}
+
 		return HTMLTable;
 	}
 	

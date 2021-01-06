@@ -10,6 +10,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import src.database.ActiveUsersDB;
+import src.user.ExternalUser;
 import src.user.User;
 
 public class ConnexionController {
@@ -70,11 +71,29 @@ public class ConnexionController {
 				userTaken.setVisible(true);
 				usernameField.setText("");
 				
+				
 			}
 			
 		} else {
 			//TODO: On lance la version avec servlet
 			System.out.println(toogleGroupValue);
+			Main.externalUser = new ExternalUser();
+			activeUsers = Main.externalUser.getActiveUsers();
+			boolean usernameChanged = Main.externalUser.changeUsername(username);
+			if (usernameChanged) {
+				//Get the status
+				String status = choiceBox.getSelectionModel().getSelectedItem();
+				activeUsers.changeStatus(username, status);
+				//Last part before displaying the chat screen
+				Main.showChatLayout();
+				
+			} else {
+				userTaken.setVisible(true);
+				usernameField.setText("");
+				
+				
+			}
+			
 		}
 
 	}

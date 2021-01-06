@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import src.user.ExternalUser;
 import src.user.User;
 
 public class Main extends Application {
@@ -26,6 +27,7 @@ public class Main extends Application {
 	private static BorderPane chatLayout;
 	private static Stage stage;
 	public static User user;
+	public static ExternalUser externalUser;
 
 	@Override
 	public void start(Stage primaryStage) throws IOException {

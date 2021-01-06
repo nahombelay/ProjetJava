@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 public class UsersDatabaseServer {
 	
 	private Connection c = null;
@@ -132,6 +133,40 @@ public class UsersDatabaseServer {
 		}
 	}
 	
+	public ArrayList<ArrayList<String>> createTable(String Table){
+		ArrayList<String> ip = new ArrayList<String>();
+		ArrayList<String> username = new ArrayList<String>();
+		ArrayList<String> status = new ArrayList<String>();
+		String query = "SELECT ip, username, status FROM " + Table + " ;";
+		try {
+			stm = c.createStatement();
+			rs = stm.executeQuery(query);
+			if (rs != null) {
+				while (rs.next()) {					
+					ip.add(rs.getString(1));
+					username.add(rs.getString(2));
+					status.add(rs.getString(3));
+				}
+				rs.close();
+				stm.close();
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(ip.size() == 0) {
+			return null;
+		} else {
+			ArrayList<ArrayList<String>> array = new ArrayList<ArrayList<String>>();
+			array.add(ip);
+			array.add(username);
+			array.add(status);
+			return array;
+		}
+		
+	}
+	
 	public String getSessionId(String ip, String table) {
 		String sessionID = null;
 		String query = "SELECT sessionID FROM " + table + " WHERE ip = '" + ip + "' ;" ;
@@ -157,6 +192,6 @@ public class UsersDatabaseServer {
 	}
 	public static void main (String [] agrv) {
 		UsersDatabaseServer db = new UsersDatabaseServer();
-		
+		db.createTable("ExternalUsers");
 	}
 }

@@ -2,6 +2,8 @@ package src.scrapper;
 
 import java.io.File;
 import java.io.IOException;
+
+import src.database.ActiveUsersDB;
 import src.database.UserDB;
 
 
@@ -15,22 +17,14 @@ public class HTMLscrapper {
 
 	private static Document document;
 	
-	//private UserDB usersDatabase;
+	private ActiveUsersDB usersDatabase;
 	
-	//public HTMLscrapper(UserDB usersDatabase) {
-	public HTMLscrapper() {
-		//this.usersDatabase = usersDatabase;
+	public HTMLscrapper(String table){
+		this.usersDatabase = new ActiveUsersDB();
 		
-		File htmlFile = new File("/Users/nahombelay/Desktop/test.html");
+		//File htmlFile = new File("/Users/nahombelay/Desktop/test.html");
 		
-		try {
-			document = (Document) Jsoup.parse(htmlFile, "UTF-8", "");
-			
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		document = (Document) Jsoup.parse(table);
 	}
 	
 	 
@@ -39,7 +33,7 @@ public class HTMLscrapper {
 		return document;
 	}
 
-	public static Elements getTable() {
+	public Elements getTable() {
 		return getDocument().select("table.Users.table tr");
 	}
 	
@@ -60,15 +54,24 @@ public class HTMLscrapper {
 				username = row.select("td:nth-of-type(2)").text();
 				status = row.select("td:nth-of-type(3)").text();
 				//TODO: replace with insert to database
-				System.out.println(ip + "-" + username + "-" + status);
+				//System.out.println(ip + "-" + username + "-" + status);
+				usersDatabase.addUser(ip, username);
+				if (!status.equals("Online")) {
+					try {
+						usersDatabase.changeStatus(username, status);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 	}
 	
 	public static void main (String[] argv) {
 		
-		HTMLscrapper hc = new HTMLscrapper();
-		Elements e = getTable();
+		HTMLscrapper hc = new HTMLscrapper("");
+		Elements e = hc.getTable();
 		hc.addRowsToDatabase(e);
 		
 		System.out.println(hc.getMessage());
