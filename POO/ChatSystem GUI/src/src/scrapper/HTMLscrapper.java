@@ -24,7 +24,7 @@ public class HTMLscrapper {
 		
 		//File htmlFile = new File("/Users/nahombelay/Desktop/test.html");
 		
-		document = (Document) Jsoup.parse(table);
+		document = Jsoup.parse(table);
 	}
 	
 	 
@@ -47,14 +47,14 @@ public class HTMLscrapper {
 		String status;
 		
 		for (Element row : document.select("table.Users.table tr")) {
-			if (row.select("td:nth-of-type(1)").text().equals("ip")) {
+			if (row.select("th:nth-of-type(1)").text().equals("ip")) {
 				continue;
 			} else {
 				ip = row.select("td:nth-of-type(1)").text();
 				username = row.select("td:nth-of-type(2)").text();
 				status = row.select("td:nth-of-type(3)").text();
 				//TODO: replace with insert to database
-				//System.out.println(ip + "-" + username + "-" + status);
+				System.out.println(ip + "-" + username + "-" + status);
 				usersDatabase.addUser(ip, username);
 				if (!status.equals("Online")) {
 					try {
@@ -70,7 +70,7 @@ public class HTMLscrapper {
 	
 	public static void main (String[] argv) {
 		
-		HTMLscrapper hc = new HTMLscrapper("");
+		HTMLscrapper hc = new HTMLscrapper("<table class=\"Users Table\"><tr><th>ip</th><th>username</th><th>status</th></tr><tr><td> 1.1.0.1</td><td> user1</td><td> Online</td></tr><tr><td> 11.1.2.1</td><td> lolo</td><td> Online</td></tr><tr><td> 1.0.2.1</td><td> user2</td><td> Online</td></tr>");
 		Elements e = hc.getTable();
 		hc.addRowsToDatabase(e);
 		

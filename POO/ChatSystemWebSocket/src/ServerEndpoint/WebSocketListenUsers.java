@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.websocket.OnClose;
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.PongMessage;
@@ -49,12 +50,12 @@ public class WebSocketListenUsers {
 			
 			if (formatedMessage[0].equals("[NewUser]")) {
 				//format: [NewUser]:ip:username:status:internal/external
-				try {
-					this.session.getBasicRemote().sendText("From Server: User has been added");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+//				try {
+//					this.session.getBasicRemote().sendText("From Server: User has been added");
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 				
 				String userInfo = "[NewUser]" +formatedMessage[1] + ":" + formatedMessage[2] + ":" + formatedMessage[3];
 				broadcastUserInfo(db, userInfo, formatedMessage[4]);
@@ -93,8 +94,8 @@ public class WebSocketListenUsers {
 				
 			} else if (formatedMessage[0].equals("[Forward]")) {
 				System.out.println("Forwarding from " + formatedMessage[1] + " to " + formatedMessage[2]);
-				String messageToBeForwarded = "[Forwarded]:" + formatedMessage[1] + ":" + formatedMessage[3];
-				if (formatedMessage[4].equals("InternalUsers")) {
+				String messageToBeForwarded = "[Forwarded]:" + formatedMessage[1] + ":" + formatedMessage[4];
+				if (formatedMessage[3].equals("InternalUsers")) {
 					forwardMessage(db, formatedMessage[2] , formatedMessage[1] , "ExternalUsers", messageToBeForwarded);
 				} else {
 					forwardMessage(db, formatedMessage[2] , formatedMessage[1] , "InternalUsers", messageToBeForwarded);
@@ -110,6 +111,11 @@ public class WebSocketListenUsers {
 		System.out.println("Closed");
 		clients.remove(session.getId(), session);
 		
+	}
+	
+	@OnError
+	public void onError(Session session, Throwable t) {
+		System.out.println(t.toString());
 	}
 	
 	public void broadcastUserInfo(UsersDatabaseServer db, String userInfo, String table) {
@@ -162,7 +168,7 @@ public class WebSocketListenUsers {
 	}
 	
 	public String usersHTMLTable(UsersDatabaseServer db, String table) {
-		String HTMLTable = "<table>\n" + 
+		String HTMLTable = "<table class=\"Users Table\">\n" + 
 				"			<tr>\n" + 
 				"				<th>ip</th>\n" + 
 				"				<th>username</th>\n" + 
