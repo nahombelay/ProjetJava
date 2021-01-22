@@ -40,6 +40,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -173,8 +174,9 @@ public class ChatController implements PropertyChangeListener {
 	private void addButtonToTable() {
 		tableView.getColumns().clear();
 		TableColumn<Login, Void> colBtn = new TableColumn<Login, Void>("Users");
-        colBtn.setMinWidth(318);
-        colBtn.setMaxWidth(318);
+		colBtn.setStyle("-fx-background-color: linear-gradient(to right, #9F8DC7, #8883B7)");
+        colBtn.setMinWidth(316);
+        colBtn.setMaxWidth(316);
         Callback<TableColumn<Login, Void>, TableCell<Login, Void>> cellFactory = new Callback<TableColumn<Login, Void>, TableCell<Login, Void>>() {
             @Override
             public TableCell<Login, Void> call(final TableColumn<Login, Void> param) {
@@ -195,9 +197,9 @@ public class ChatController implements PropertyChangeListener {
                             setGraphic(btn);
                             Login login = getTableView().getItems().get(getIndex());
                             btn.setText(login.getLogin());
-                            btn.setPrefWidth(318);
-                            btn.setMinWidth(318);
-                            btn.setMaxWidth(318);
+                            btn.setPrefWidth(305);
+                            btn.setMinWidth(305);
+                            btn.setMaxWidth(305);
                             btn.setWrapText(true);
                             Font font = Font.font("Arial", FontWeight.BOLD, 15);
                             btn.setFont(font);
@@ -488,7 +490,6 @@ public class ChatController implements PropertyChangeListener {
 		activeCi.start();
 		vbox.getChildren().clear();
 		displayHistory(ip);
-
 	}
 
 	/**
@@ -501,14 +502,15 @@ public class ChatController implements PropertyChangeListener {
 		if (ip == null) {
 			System.out.println("Select a user to get his ip");
 		} else {
-			Socket sock = convList.getSocket(ip);
-			convList.removeConv(ip, sock);
+			//Socket sock = convList.getSocket(ip);
+			//convList.removeConv(ip, sock);
 			textArea.setText(null);
 			sendMessage();
+			Socket sock = convList.getSocket(ip);
+			convList.removeConv(ip, sock);
 			textArea.setText("");
-			conversationOpen(false);
 		}
-		
+		conversationOpen(false);
 	}
 	
 	/**
@@ -530,7 +532,12 @@ public class ChatController implements PropertyChangeListener {
 				System.out.println("Select a user to get his ip");
 			} else {
 				String text = textArea.getText();
-				if (text.equals("")) {
+				if (text == null) {
+					PrintWriter writer = new PrintWriter(out);
+					writer.write(text + "\n");
+					writer.flush();
+					textArea.setText("");
+				} else if (text.equals("")) {
 					System.out.println("Empty Message");
 				} else {
 					MDB.addMessage(ip, true, text);
@@ -557,27 +564,36 @@ public class ChatController implements PropertyChangeListener {
 	 * @param timestamp : when the message was send or received
 	 */
 	private void display(String msg, boolean isSender, String timestamp) {
-		Label label = new Label(); 
-		label.setMinWidth(vbox.getMinWidth());
-		label.setMaxWidth(vbox.getMaxWidth());
-		label.setPrefWidth(vbox.getPrefWidth());
-		label.setWrapText(true);
-		label.setPadding(new Insets(5,5,5,5));
-        label.setFont(Font.font("Arial", FontWeight.NORMAL, 13));
-		String textToDisplay = null;
-		if (isSender) {
-			textToDisplay = msg + " : " + timestamp;
-			label.setAlignment(Pos.CENTER_RIGHT);
-			label.setStyle("-fx-background-color: #0078FF; -fx-background-radius: 10px 10px 0px 10px;");
-			label.setTextFill(Color.web("#ffffff"));
+		if (msg.equals("null")) {
+			conversationOpen(false);
 		} else {
-			textToDisplay = timestamp + " : " + msg;
-			label.setAlignment(Pos.CENTER_LEFT);
-			label.setStyle("-fx-background-color: #dfe1ee; -fx-background-radius: 10px 10px 10px 0px;");
+			Label label = new Label(); 
+			Label tLabel = new Label();
+			tLabel.setFont(new Font("Arial", 5));
+			tLabel.setScaleX(0.7);
+			tLabel.setScaleY(0.7);
+			tLabel.setText(timestamp);
+			label.setWrapText(true);
+			label.setPadding(new Insets(5,10,5,10));
+	        label.setFont(new Font("Arial", 14));
+	        label.setText(msg);
+			HBox hBox = new HBox();
+			hBox.setPadding(new Insets(0,5,0,0));
+			if (isSender) {
+				label.setStyle("-fx-background-color: #0078FF; -fx-background-radius: 10px 10px 0px 10px;");
+				label.setTextFill(Color.web("#ffffff"));
+		        hBox.getChildren().add(tLabel);
+		        hBox.getChildren().add(label);
+		        hBox.setAlignment(Pos.BASELINE_RIGHT);
+			} else {
+				label.setStyle("-fx-background-color: #dfe1ee; -fx-background-radius: 10px 10px 10px 0px;");
+				hBox.getChildren().add(label);
+				hBox.getChildren().add(tLabel);
+			    hBox.setAlignment(Pos.BASELINE_LEFT);
+			}
+			vbox.getChildren().add(hBox);
+			chatPane.setVvalue(chatPane.getVvalue()+ label.getHeight() + 10);
 		}
-		label.setText(textToDisplay);
-		vbox.getChildren().add(label);
-		chatPane.setVvalue(chatPane.getVvalue()+ label.getHeight() + 10);
 	}
 	
 	/**
@@ -601,6 +617,7 @@ public class ChatController implements PropertyChangeListener {
 				display(textArray.get(i), isSender, timeArray.get(i));
 			}
 		}
+		chatPane.setVvalue(vbox.getHeight());
 	}
 	
 

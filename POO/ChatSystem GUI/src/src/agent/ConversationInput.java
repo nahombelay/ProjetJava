@@ -44,7 +44,7 @@ public class ConversationInput extends Thread {
 			try {
 				inputBuffer = new BufferedReader(new InputStreamReader(socketInput.getInputStream()));
 				String resp = inputBuffer.readLine();
-				if (resp == null) {
+				if (resp == null || resp.equals("null")) {
 					System.out.println("[ConversationInput] " + socketInput.toString() + " : End of Conversation.");
 					socketInput.close();
 					break;
