@@ -16,6 +16,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -40,6 +41,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -569,14 +571,29 @@ public class ChatController implements PropertyChangeListener {
 		} else {
 			Label label = new Label(); 
 			Label tLabel = new Label();
-			tLabel.setFont(new Font("Arial", 5));
+			tLabel.setFont(new Font("Arial", 7));
 			tLabel.setScaleX(0.7);
 			tLabel.setScaleY(0.7);
 			tLabel.setText(timestamp);
+			tLabel.setVisible(false);
 			label.setWrapText(true);
 			label.setPadding(new Insets(5,10,5,10));
 	        label.setFont(new Font("Arial", 14));
 	        label.setText(msg);
+	        label.setOnMouseEntered(new EventHandler<MouseEvent>() {
+			    @Override public void handle(MouseEvent e) {
+			        tLabel.setVisible(true);
+			        label.setScaleX(1.1);
+			        label.setScaleY(1.1);
+			    }
+			});
+			label.setOnMouseExited(new EventHandler<MouseEvent>() {
+			    @Override public void handle(MouseEvent e) {
+			    	tLabel.setVisible(false);
+			    	label.setScaleX(1);
+			    	label.setScaleY(1);
+			    }
+			});
 			HBox hBox = new HBox();
 			hBox.setPadding(new Insets(0,5,0,0));
 			if (isSender) {
@@ -617,7 +634,6 @@ public class ChatController implements PropertyChangeListener {
 				display(textArray.get(i), isSender, timeArray.get(i));
 			}
 		}
-		chatPane.setVvalue(vbox.getHeight());
 	}
 	
 
