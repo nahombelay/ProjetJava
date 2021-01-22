@@ -43,15 +43,8 @@ public class ListenSocket extends Thread {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			//ConversationInput ci = new ConversationInput(socketConversation, messagesDB);
-			//ConversationOutput co = new ConversationOutput(socketConversation, messagesDB);
-	        //ci.start();
-	        //co.start();
 	      }
-		//ConversationInput.stop = true;
-		//ConversationOutput.stop = true;
 		System.out.println("[ListenSocket] End of Thread");
-		
 	}
 
 	public ServerSocket getServerSocket() {
@@ -67,5 +60,9 @@ public class ListenSocket extends Thread {
     public void addChangeListener(PropertyChangeListener newListener) {
         listener.add(newListener);
     }
+
+	public MessagesDB getMessagesDB() {
+		return messagesDB;
+	}
 
 }

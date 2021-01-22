@@ -3,8 +3,6 @@ package src.agent;
 import java.io.IOException;
 import java.net.Socket;
 
-import src.communications.sendTCP;
-
 public class BindToPeer {
 	
 	private String ip;
@@ -15,7 +13,7 @@ public class BindToPeer {
 		this.ip = ip;
 		this.port = port;
 		try {
-			this.socket = new Socket(this.ip,this.port);
+			BindToPeer.socket = new Socket(this.ip,this.port);
 			System.out.println(socket);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

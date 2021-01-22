@@ -7,8 +7,7 @@ import java.util.Scanner;
 
 import src.communications.sendTCP;
 import src.database.MessagesDB;
-import src.messages.Timestamp;
-
+//We don't use this class anymore but it left as an example
 public class ConversationOutput extends Thread {
 	
 	private sendTCP stcp;
@@ -54,6 +53,9 @@ public class ConversationOutput extends Thread {
 		System.out.println("[ConversationOutput] End of Thread");
 	
 		
+	}
+	public Socket getSocketOutput() {
+		return socketOutput;
 	}
 
 }

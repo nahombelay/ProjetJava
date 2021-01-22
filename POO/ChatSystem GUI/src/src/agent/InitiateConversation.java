@@ -15,7 +15,6 @@ public class InitiateConversation extends Thread{
 		this.ip = ip;
 		this.messagesDB = messagesDB;
 		this.socket = new BindToPeer(this.ip, port).getSocket();
-		System.out.println(socket);
 	}
 	
 	public void run() {
@@ -33,6 +32,10 @@ public class InitiateConversation extends Thread{
 	
 	public Socket getSocket() {
 		return this.socket;
+	}
+
+	public MessagesDB getMessagesDB() {
+		return messagesDB;
 	}
 	
 	

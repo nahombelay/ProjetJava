@@ -45,7 +45,7 @@ public class ConnexionController {
 	private void connection() throws Exception {
 		
 		userTaken.setVisible(false);
-		
+
 		//Get username
 		String username = usernameField.getText();
 	
@@ -54,8 +54,7 @@ public class ConnexionController {
 		toogleGroupValue = selectedRadioButton.getText();
 	
 		if (toogleGroupValue.equals("Intern")) {
-			//On lance un nouvel user ? 
-			System.out.println(toogleGroupValue);
+			//On lance une instance de User
 			Main.user = new User();
 			activeUsers = Main.user.getActiveUsers();
 			//Check if it's unique --> we shoudn't continue if the username is not unique 
@@ -66,17 +65,13 @@ public class ConnexionController {
 				activeUsers.changeStatus(username, status);
 				//Last part before displaying the chat screen
 				Main.showChatLayout();
-				
 			} else {
 				userTaken.setVisible(true);
 				usernameField.setText("");
-				
-				
 			}
 			
 		} else {
-			//TODO: On lance la version avec servlet
-			System.out.println(toogleGroupValue);
+			//On lance une instance de ExternalUser
 			Main.externalUser = new ExternalUser();
 			activeUsers = Main.externalUser.getActiveUsers();
 			boolean usernameChanged = Main.externalUser.changeUsername(username);
@@ -85,18 +80,11 @@ public class ConnexionController {
 				String status = choiceBox.getSelectionModel().getSelectedItem();
 				activeUsers.changeStatus(username, status);
 				//Last part before displaying the chat screen
-				Main.showChatLayout();
-				
+				Main.showChatLayout();	
 			} else {
 				userTaken.setVisible(true);
 				usernameField.setText("");
-				
-				
-			}
-			
+			}		
 		}
-
 	}
-
-
 }
