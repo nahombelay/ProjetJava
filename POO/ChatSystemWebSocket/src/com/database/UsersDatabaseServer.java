@@ -50,6 +50,32 @@ public class UsersDatabaseServer {
 		}
 	}
 	
+	public void deleteAll() {
+		try {
+			this.stm = c.createStatement();
+			this.rowsModified = stm.executeUpdate("DELETE FROM InternalUsers" + ";");
+
+			stm.close();
+			
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			this.stm = c.createStatement();
+			this.rowsModified = stm.executeUpdate("DELETE FROM ExternalUsers" + ";");
+
+			stm.close();
+			
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public void deleteUser(String ip, String username, String sessionID, String table) {
 		String query = "DELETE FROM " + table + " WHERE ip = ? OR username = ? OR sessionID = ?;";
 		
@@ -192,6 +218,6 @@ public class UsersDatabaseServer {
 	}
 	public static void main (String [] agrv) {
 		UsersDatabaseServer db = new UsersDatabaseServer();
-		db.createTable("ExternalUsers");
+		db.deleteAll();
 	}
 }

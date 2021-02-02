@@ -14,10 +14,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.websocket.ClientEndpoint;
 import javax.websocket.ContainerProvider;
 import javax.websocket.DeploymentException;
+import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
+import javax.websocket.server.ServerEndpoint;
 
 import src.communications.SendUDP;
 import src.communications.WebSocketClient;
@@ -33,6 +36,8 @@ public class ExternalUser {
 	private MessagesDB messageDB;
 	
 	private WebSocketClient endpoint;
+	
+
 	private Session session;
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 	//private final static String IP = "192.168.1.1";
@@ -62,6 +67,10 @@ public class ExternalUser {
 		return activeUsers;
 	}
 	
+	public WebSocketClient getEndpoint() {
+		return endpoint;
+	}
+	
 	private void settingIPInfo() {
 		//get IP address       
         this.ip = this.getLocalAddress();
@@ -87,12 +96,12 @@ public class ExternalUser {
 		
 	}
 	
-	public boolean changeUsername(String username) throws UnknownHostException, IOException {
+	public boolean changeUsername(String username, String status) throws UnknownHostException, IOException {
 		//verify that username is not taken
 		boolean changed = false;
 		if (!(activeUsers.hasValue(username))){
 			login.setLogin(username);
-			String message = "[UserUpdate]:" + this.ipString + ":" + username + ":" + "ExternalUsers";
+			String message = "[UserUpdate]:" + this.ipString + ":" + username + ":" + status + ":" + "ExternalUsers";
 			this.endpoint.sendMessage(message);
 			changed = true;
 		} 
@@ -108,13 +117,12 @@ public class ExternalUser {
 	
 	private void websocketThread() {
 		
-		this.endpoint = new WebSocketClient(); 
-		
+		this.endpoint = new WebSocketClient(messageDB); 
 		
  		WebSocketContainer container = ContainerProvider.getWebSocketContainer();
 		
 		try {	
-			this.session = container.connectToServer(endpoint, new URI("ws://localhost:8080/ChatSystemWebSocket/hello"));
+			this.session = container.connectToServer(endpoint, new URI("ws://localhost:8080/ChatSystemWebSocket/ListenUsers"));
 		} catch (DeploymentException | IOException | URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -136,6 +144,11 @@ public class ExternalUser {
         }
         return null;
     }
+	
+	@OnMessage
+	public void onTextMessage(String message, Session session) {
+		System.out.println(message);
+	}
 	
 	public static void main(String[] args) throws UnknownHostException, IOException {
 		@SuppressWarnings("unused")

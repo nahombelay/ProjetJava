@@ -27,6 +27,7 @@ import src.agent.InitiateConversation;
 import src.agent.ListenSocket;
 import src.agent.MainSocket;
 import src.communications.SendUDP;
+import src.communications.WebSocketClient;
 import src.database.ActiveUsersDB;
 import src.database.MessagesDB;
 import src.messages.Timestamp;
@@ -122,7 +123,9 @@ public class ChatController implements PropertyChangeListener {
 	
 	private final String location = ConnexionController.toogleGroupValue;
 	
-	Alert a = new Alert(AlertType.NONE); 
+	Alert a = new Alert(AlertType.NONE);
+
+	private WebSocketClient endpoint = null; 
 	
 	
 	//Methods
@@ -131,20 +134,32 @@ public class ChatController implements PropertyChangeListener {
 	private void initialize() throws ClassNotFoundException, SQLException, IOException {
 		if (location.equals("Intern")) {
 			activeUsers = Main.user.getActiveUsers();
+			activeUsers.addChangeListener(this);
+	        list = activeUsers.getAllUsers();
+			for(Login l : list) {
+				addUser(l);
+			}
+	        addButtonToTable();
+	        convList = new Conversations();
+	        this.MDB = new MessagesDB();
+	        threadTCP();
+	        
 		} else {
 			activeUsers = Main.externalUser.getActiveUsers();
+			activeUsers.addChangeListener(this);
+	        list = activeUsers.getAllUsers();
+			for(Login l : list) {
+				addUser(l);
+			}
+	        addButtonToTable();
+	        convList = new Conversations();
+	        this.MDB = new MessagesDB();
+	        this.endpoint =  Main.externalUser.getEndpoint();
+	        this.endpoint.addChangeListener(this);
+	        
 		}
         
-        activeUsers.addChangeListener(this);
-        list = activeUsers.getAllUsers();
-		for(Login l : list) {
-			addUser(l);
-		}
-        addButtonToTable();
-        convList = new Conversations();
-        this.MDB = new MessagesDB();
-        threadTCP();
-        vbox.setSpacing(5);
+		vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 10, 10, 10));
         vbox.setMaxHeight(Double.MAX_VALUE);
 	}
@@ -187,7 +202,11 @@ public class ChatController implements PropertyChangeListener {
                     {
                         btn.setOnAction((ActionEvent event) -> {
                         	Login login = getTableView().getItems().get(getIndex());
-                            startConnexion(login);
+                        	if (location.equals("Intern")) {
+	                            startConnexion(login);
+                        	} else {
+                        		startConnexionExternal(login);
+                        	}
                         });                
                     }
 					@Override
@@ -265,6 +284,7 @@ public class ChatController implements PropertyChangeListener {
 			login = Main.user.getLogin();
 			activeUsers.changeStatus(login.getLogin(), "Online");
 			//add user from active users list of everyone
+			//TODO: if online do nothing 
 			SendUDP.send("[1BD]:" + login.toString(), InetAddress.getByName("255.255.255.255"), 20000, true);
 		} else if (location.equals("Extern")) {
 			//TODO: Complete once servlet done
@@ -493,6 +513,16 @@ public class ChatController implements PropertyChangeListener {
 		vbox.getChildren().clear();
 		displayHistory(ip);
 	}
+	
+	private void startConnexionExternal(Login login) {
+		String ip = login.getIp();
+		this.activeIp = ip;
+		conversationOpen(true);
+		updateConvoWithLabel(login.getLogin());
+		updateDateLabel(Timestamp.formatDateTime());
+		vbox.getChildren().clear();
+		displayHistory(ip);
+	}
 
 	/**
 	 * Close the active conversation by calling the function conversationOpen(Boolean) and remove the conversation from the conversation list
@@ -525,38 +555,73 @@ public class ChatController implements PropertyChangeListener {
 	 */
 	@FXML
 	private void sendMessage() {
-		String ip = activeIp;
-		Socket sock = convList.getSocket(ip);
-		OutputStream out = null;
-		try {
-			out = sock.getOutputStream();
-			if (ip == null) {
+		if (location.equals("Intern")) {
+			String ip = activeIp;
+			Socket sock = convList.getSocket(ip);
+			OutputStream out = null;
+			try {
+				out = sock.getOutputStream();
+				if (ip == null) {
+					System.out.println("Select a user to get his ip");
+				} else {
+					String text = textArea.getText();
+					if (text == null) {
+						PrintWriter writer = new PrintWriter(out);
+						writer.write(text + "\n");
+						writer.flush();
+						textArea.setText("");
+					} else if (text.equals("")) {
+						System.out.println("Empty Message");
+					} else {
+						MDB.addMessage(ip, true, text);
+						//send message
+						PrintWriter writer = new PrintWriter(out);
+						writer.write(text + "\n");
+						writer.flush();
+						//display the message
+						String timestamp = Timestamp.formatDateTimeFull();
+						display(text, true, timestamp);
+						textArea.setText("");
+					}	
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			String sourceIP = Main.externalUser.getLogin().getIp();
+			String destIP = this.activeIp;
+			
+			String message = null;
+			
+			if (destIP == null) {
 				System.out.println("Select a user to get his ip");
 			} else {
 				String text = textArea.getText();
-				if (text == null) {
-					PrintWriter writer = new PrintWriter(out);
-					writer.write(text + "\n");
-					writer.flush();
-					textArea.setText("");
-				} else if (text.equals("")) {
+				if (text.equals("")) {
 					System.out.println("Empty Message");
 				} else {
-					MDB.addMessage(ip, true, text);
+					MDB.addMessage(destIP, true, text);
 					//send message
-					PrintWriter writer = new PrintWriter(out);
-					writer.write(text + "\n");
-					writer.flush();
+					//use endpoint to send message 
+					if (endpoint != null) {
+						message = "[Forward]:" + sourceIP + ":" + destIP + ":ExternalUsers:" + text;
+						try {
+							this.endpoint.sendMessage(message);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
 					//display the message
 					String timestamp = Timestamp.formatDateTimeFull();
 					display(text, true, timestamp);
 					textArea.setText("");
 				}	
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
 		}
+		
 	}
 	
 	/**

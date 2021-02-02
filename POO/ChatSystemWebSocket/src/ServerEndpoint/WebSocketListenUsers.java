@@ -3,6 +3,7 @@ package ServerEndpoint;
 
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -58,47 +59,38 @@ public class WebSocketListenUsers {
 //				}
 				
 				String userInfo = "[NewUser]" +formatedMessage[1] + ":" + formatedMessage[2] + ":" + formatedMessage[3];
-				broadcastUserInfo(db, userInfo, formatedMessage[4]);
+				broadcastUserInfo(db, userInfo, formatedMessage[3]);
 				
-				String HTMLTable = usersHTMLTable(db, formatedMessage[4]);
+				String HTMLTable = usersHTMLTable(db, formatedMessage[3]);
 				try {
-					System.out.println(HTMLTable);
+					//System.out.println(HTMLTable);
 					session.getBasicRemote().sendText(HTMLTable);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				
-				db.addUser(formatedMessage[1], formatedMessage[2], formatedMessage[3], session.getId(), formatedMessage[4]);
+				db.addUser(formatedMessage[1], formatedMessage[2], "Online", session.getId(), formatedMessage[3]);
 				
 			} else if (formatedMessage[0].equals("[UserUpdate]")) {
-				if (formatedMessage[2].contentEquals("offline")) {
+				//FORMAT: [UserUpdate]:ip:username:status:table
+				if (formatedMessage[3].equals("Offline")) {
 					db.deleteUser(formatedMessage[1], formatedMessage[2], session.getId(), formatedMessage[4]);
 				} else {
 					db.updateUser(formatedMessage[1], formatedMessage[2], formatedMessage[3], session.getId(), formatedMessage[4]);
 				}
-
-				String userInfo = "[UserUpdate]" + formatedMessage[1] + ":" + formatedMessage[2];
-				broadcastUserInfo(db, userInfo, formatedMessage[4]);
-				
-			} else if (formatedMessage[0].equals("[UserUpdate]")) {
-				//format [UserUpdate]:ip:username:status
-				if (formatedMessage[2].contentEquals("Offline")) {
-					db.deleteUser(formatedMessage[1], formatedMessage[2], session.getId(), formatedMessage[4]);
-				} else {
-					db.updateUser(formatedMessage[1], formatedMessage[2], formatedMessage[3], session.getId(), formatedMessage[4]);
-				}
-
-				String userInfo = "[UserUpdate]" + formatedMessage[1] + ":" + formatedMessage[2];
+				String userInfo = "[UserUpdate]" + formatedMessage[1] + ":" + formatedMessage[2] +  ":" + formatedMessage[3];
 				broadcastUserInfo(db, userInfo, formatedMessage[4]);
 				
 			} else if (formatedMessage[0].equals("[Forward]")) {
+				//[FORWARD]:ipSource:ipDest:Table:message
 				System.out.println("Forwarding from " + formatedMessage[1] + " to " + formatedMessage[2]);
+				//[FORWARDed]:ipSource:message
 				String messageToBeForwarded = "[Forwarded]:" + formatedMessage[1] + ":" + formatedMessage[4];
 				if (formatedMessage[3].equals("InternalUsers")) {
 					forwardMessage(db, formatedMessage[2] , formatedMessage[1] , "ExternalUsers", messageToBeForwarded);
 				} else {
-					forwardMessage(db, formatedMessage[2] , formatedMessage[1] , "InternalUsers", messageToBeForwarded);
+					forwardMessage(db, formatedMessage[2] , formatedMessage[1] , "ExternalUsers", messageToBeForwarded);
 				}
 				
 			}
@@ -117,6 +109,8 @@ public class WebSocketListenUsers {
 	public void onError(Session session, Throwable t) {
 		System.out.println(t.toString());
 	}
+	
+
 	
 	public void broadcastUserInfo(UsersDatabaseServer db, String userInfo, String table) {
 		String currentSessionId = this.session.getId();
@@ -144,8 +138,8 @@ public class WebSocketListenUsers {
 		} else {
 			for (String sessionId : clients.keySet()) {
 				if (!sessionId.equals(currentSessionId)){
-					Session session = clients.get(sessionId);
 					try {
+						Session session = clients.get(sessionId);
 						session.getBasicRemote().sendText(userInfo);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block

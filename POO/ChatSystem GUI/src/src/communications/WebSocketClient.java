@@ -1,10 +1,14 @@
 package src.communications;
 
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.websocket.ClientEndpoint;
 import javax.websocket.ContainerProvider;
@@ -18,14 +22,23 @@ import javax.websocket.WebSocketContainer;
 
 import org.jsoup.select.Elements;
 
+import chatSytem.view.ChatController;
 import src.database.ActiveUsersDB;
+import src.database.MessagesDB;
 import src.scrapper.HTMLscrapper;
 
 @ClientEndpoint
 public class WebSocketClient extends Endpoint {
-
+	private MessagesDB messagesDB;
 	private Session session;
 	
+	private List<PropertyChangeListener> listener = new ArrayList<PropertyChangeListener>();
+	
+	public WebSocketClient(MessagesDB messageDB) {
+		this.messagesDB = messageDB;
+	}
+
+
 	@Override
 	public void onOpen(Session session, EndpointConfig arg1) {
 		this.session = session;
@@ -60,21 +73,33 @@ public class WebSocketClient extends Endpoint {
 					
 					//TODO: if message is textmessage
 				else {
-					//[FORWARDED]:sourceip:destinationip:internal/external:message
 					//[FORWARDED]:sender:message
 					String [] formatedMessage = message.split(":");
 					String sender = formatedMessage[1];
 					String text = formatedMessage[2];
 					
-					//TODO: notify chat controller
-					
-					
+					messagesDB.addMessage(sender, false, text);
+					//send a signal to chat Controller
+					notifyListeners(ChatController.class, "incomingMSG", sender, text);
+					System.out.println("[WebSocketClient] Chat Controller Notified");
+
 				}
 				
 			}
 		});
 	}
 	
+	
+	private synchronized void notifyListeners(Object object, String property, String ip, String msg) {
+        for (PropertyChangeListener name : listener) {
+            name.propertyChange(new PropertyChangeEvent(this, property, ip, msg));
+        }
+    }
+
+    public void addChangeListener(PropertyChangeListener newListener) {
+        listener.add(newListener);
+    }
+    
 	public void sendMessage(String message) throws IOException {
 		this.session.getBasicRemote().sendText(message);
 	}
@@ -117,7 +142,7 @@ public class WebSocketClient extends Endpoint {
 //	}
 	
 	public static void main (String[] argv) {
-		WebSocketClient endpoint = new WebSocketClient(); 
+		WebSocketClient endpoint = new WebSocketClient(new MessagesDB()); 
 		Session sess = null;
 		
  		WebSocketContainer container = ContainerProvider.getWebSocketContainer();

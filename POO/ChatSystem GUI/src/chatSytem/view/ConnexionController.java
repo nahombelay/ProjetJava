@@ -74,10 +74,11 @@ public class ConnexionController {
 			//On lance une instance de ExternalUser
 			Main.externalUser = new ExternalUser();
 			activeUsers = Main.externalUser.getActiveUsers();
-			boolean usernameChanged = Main.externalUser.changeUsername(username);
+			String status = choiceBox.getSelectionModel().getSelectedItem();
+			boolean usernameChanged = Main.externalUser.changeUsername(username, status);
 			if (usernameChanged) {
 				//Get the status
-				String status = choiceBox.getSelectionModel().getSelectedItem();
+				
 				activeUsers.changeStatus(username, status);
 				//Last part before displaying the chat screen
 				Main.showChatLayout();	

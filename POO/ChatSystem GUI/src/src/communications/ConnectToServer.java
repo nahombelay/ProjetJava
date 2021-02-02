@@ -23,7 +23,8 @@ public class ConnectToServer {
 	private WebSocketContainer container;
 	
 	public ConnectToServer() {
-		endpoint = new WebSocketClient(); 
+		//TODO: verifier qu'on n'utilise pas
+		endpoint = new WebSocketClient(null); 
  		container = ContainerProvider.getWebSocketContainer();
  		
  		try {	
