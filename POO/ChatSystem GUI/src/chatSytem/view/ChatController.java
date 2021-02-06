@@ -277,6 +277,7 @@ public class ChatController implements PropertyChangeListener {
 	
 	@FXML
 	private void switchToOnline() throws Exception {
+		//TODO: have to check that the user isn't already online
 		System.out.println("Online");
 		String location = ConnexionController.toogleGroupValue;
 		if (location.equals("Intern")) {
@@ -287,7 +288,17 @@ public class ChatController implements PropertyChangeListener {
 			//TODO: if online do nothing 
 			SendUDP.send("[1BD]:" + login.toString(), InetAddress.getByName("255.255.255.255"), 20000, true);
 		} else if (location.equals("Extern")) {
-			//TODO: Complete once servlet done
+			String sourceIP = Main.externalUser.getLogin().getIp();
+			String username = Main.externalUser.getLogin().getLogin();
+			if (endpoint != null) {
+				String message = "[UserUpdate]:" + sourceIP + ":" + username + ":Online:ExternalUsers:";
+				try {
+					this.endpoint.sendMessage(message);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		} else {
 			throw new Exception("Unable to change Status");
 		}
@@ -302,7 +313,17 @@ public class ChatController implements PropertyChangeListener {
 			login = Main.user.getLogin();
 			activeUsers.changeStatus(login.getLogin(), "Do Not Disturb");
 		} else if (location.equals("Extern")) {
-			//TODO: Complete once servlet done
+			String sourceIP = Main.externalUser.getLogin().getIp();
+			String username = Main.externalUser.getLogin().getLogin();
+			if (endpoint != null) {
+				String message = "[UserUpdate]:" + sourceIP + ":" + username + ":Do Not Disturb:ExternalUsers:";
+				try {
+					this.endpoint.sendMessage(message);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		} else {
 			throw new Exception("Unable to change Status");
 		}
@@ -319,7 +340,17 @@ public class ChatController implements PropertyChangeListener {
 			//remove user from active users list of everyone
 			SendUDP.send("[RAU]:" + login.toString(), InetAddress.getByName("255.255.255.255"), 20000, true);
 		} else if (location.equals("Extern")) {
-			//TODO: Complete once servlet done
+			String sourceIP = Main.externalUser.getLogin().getIp();
+			String username = Main.externalUser.getLogin().getLogin();
+			if (endpoint != null) {
+				String message = "[UserUpdate]:" + sourceIP + ":" + username + ":Offline:ExternalUsers:";
+				try {
+					this.endpoint.sendMessage(message);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		} else {
 			throw new Exception("Unable to change Status");
 		}

@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,21 +48,22 @@ public class WebSocketListenUsers {
 			//System.out.println("Message = " + message + " par session: " + session.getId());
 			
 			
-			String [] formatedMessage = message.split(":");;
+			String [] formatedMessage = message.split(":");
+			String messageHeader = formatedMessage[0];
+			int messageLength = formatedMessage.length;
 			
-			if (formatedMessage[0].equals("[NewUser]")) {
+			if (messageHeader.equals("[NewUser]")) {
 				//format: [NewUser]:ip:username:status:internal/external
-//				try {
-//					this.session.getBasicRemote().sendText("From Server: User has been added");
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-				
-				String userInfo = "[NewUser]" +formatedMessage[1] + ":" + formatedMessage[2] + ":" + formatedMessage[3];
+				//format: [NewUser]:ip:username:internal/external -> by default online
+				String ipSource = formatedMessage[1];
+				String usernameSource = formatedMessage[2];
+				//String statusSource = formatedMessage[3];
+				String statusSource = "Online";
+				String typeSource = formatedMessage[3]; //internal or external
+				String userInfo = "[NewUser]:" + ipSource + ":" + usernameSource + ":" + statusSource;
 				broadcastUserInfo(db, userInfo, formatedMessage[3]);
 				
-				String HTMLTable = usersHTMLTable(db, formatedMessage[3]);
+				String HTMLTable = usersHTMLTable(db, typeSource);
 				try {
 					//System.out.println(HTMLTable);
 					session.getBasicRemote().sendText(HTMLTable);
@@ -70,27 +72,48 @@ public class WebSocketListenUsers {
 					e.printStackTrace();
 				}
 				
-				db.addUser(formatedMessage[1], formatedMessage[2], "Online", session.getId(), formatedMessage[3]);
+				db.addUser(ipSource, usernameSource, "Online", session.getId(), typeSource);
 				
-			} else if (formatedMessage[0].equals("[UserUpdate]")) {
+			} else if (messageHeader.equals("[UserUpdate]")) {
 				//FORMAT: [UserUpdate]:ip:username:status:table
-				if (formatedMessage[3].equals("Offline")) {
-					db.deleteUser(formatedMessage[1], formatedMessage[2], session.getId(), formatedMessage[4]);
-				} else {
-					db.updateUser(formatedMessage[1], formatedMessage[2], formatedMessage[3], session.getId(), formatedMessage[4]);
-				}
-				String userInfo = "[UserUpdate]" + formatedMessage[1] + ":" + formatedMessage[2] +  ":" + formatedMessage[3];
-				broadcastUserInfo(db, userInfo, formatedMessage[4]);
 				
-			} else if (formatedMessage[0].equals("[Forward]")) {
-				//[FORWARD]:ipSource:ipDest:Table:message
-				System.out.println("Forwarding from " + formatedMessage[1] + " to " + formatedMessage[2]);
-				//[FORWARDed]:ipSource:message
-				String messageToBeForwarded = "[Forwarded]:" + formatedMessage[1] + ":" + formatedMessage[4];
-				if (formatedMessage[3].equals("InternalUsers")) {
-					forwardMessage(db, formatedMessage[2] , formatedMessage[1] , "ExternalUsers", messageToBeForwarded);
+				String ipSource = formatedMessage[1];
+				String usernameSource = formatedMessage[2];
+				String statusSource = formatedMessage[3];
+				String typeSource = formatedMessage[4]; //internal or external
+				if (statusSource.equals("Offline")) {
+					db.deleteUser(ipSource, usernameSource, session.getId(), typeSource);
 				} else {
-					forwardMessage(db, formatedMessage[2] , formatedMessage[1] , "ExternalUsers", messageToBeForwarded);
+					db.updateUser(ipSource, usernameSource, statusSource, session.getId(), typeSource);
+				}
+				String userInfo = "[UserUpdate]:" + ipSource + ":" + usernameSource +  ":" + statusSource;
+				broadcastUserInfo(db, userInfo, typeSource);
+				
+			} else if (messageHeader.equals("[Forward]")) {
+				//[FORWARD]:ipSource:ipDest:Table:message
+				
+				String ipSource = formatedMessage[1];
+				String ipDest = formatedMessage[2];
+				String typeSource = formatedMessage[3];
+				String text;
+				if (messageLength == 5) {
+					text = formatedMessage[4];
+				} else {
+					text = String.join(":", Arrays.asList(formatedMessage).subList(4, messageLength));
+				}
+				
+				System.out.println("Forwarding from " + ipSource + " to " + ipDest);
+				//[Forwarded]:ipSource:message
+				String messageToBeForwarded = "[Forwarded]:" + ipSource + ":" + text;
+				if (typeSource.equals("InternalUsers")) {
+					forwardMessage(db, ipDest , ipSource , "ExternalUsers", messageToBeForwarded);
+				} else {
+					if (db.getSessionId(ipDest, "ExternalUsers") != null) {
+						forwardMessage(db, ipDest , ipSource , "ExternalUsers", messageToBeForwarded);
+					} else {
+						forwardMessage(db, ipDest , ipSource , "InternalUsers", messageToBeForwarded);
+					}
+					
 				}
 				
 			}
@@ -101,7 +124,11 @@ public class WebSocketListenUsers {
 	@OnClose
 	public void onClose(Session session) {
 		System.out.println("Closed");
-		clients.remove(session.getId(), session);
+		String sessionID = session.getId();
+		clients.remove(sessionID, session);
+		if ((db.isInTable(sessionID, "InternalUsers")) || (db.isInTable(sessionID, "ExternalUsers"))) {
+			db.deleteUser(sessionID);
+		} 
 		
 	}
 	

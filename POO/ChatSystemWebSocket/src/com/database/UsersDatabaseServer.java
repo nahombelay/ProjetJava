@@ -24,7 +24,7 @@ public class UsersDatabaseServer {
 		try {
 			//Class.forName("com.mysql.cj.jdbc.Driver");
 			c = DriverManager.getConnection(url, username, password);
-			System.out.println("[" + this.getClass().toString() + "] Connection OK");
+			//System.out.println("[" + this.getClass().toString() + "] Connection OK");
 	
 		} catch ( SQLException  e) {
 			// TODO Auto-generated catch block
@@ -164,6 +164,7 @@ public class UsersDatabaseServer {
 		ArrayList<String> username = new ArrayList<String>();
 		ArrayList<String> status = new ArrayList<String>();
 		String query = "SELECT ip, username, status FROM " + Table + " ;";
+		
 		try {
 			stm = c.createStatement();
 			rs = stm.executeQuery(query);
