@@ -1,5 +1,6 @@
 package chatSytem.view;
 
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -282,10 +283,16 @@ public class ChatController implements PropertyChangeListener {
 		if (location.equals("Intern")) {
 			activeUsers = Main.user.getActiveUsers();
 			login = Main.user.getLogin();
+			String currentStatus = activeUsers.getStatus(login.getIp());
+			if (currentStatus.equals("Offline")) {
+				//add user from active users list of everyone
+				SendUDP.send("[1BD]:" + login.toString(), InetAddress.getByName("255.255.255.255"), 20000, true);
+			} else if (currentStatus.equals("Do Not Disturb")) {
+				//Send a broadcast to update status to other users
+				SendUDP.send("[DND]:" + login.toString(), InetAddress.getByName("255.255.255.255"), 20000, true);
+			} 
+			//Pas sur que cette ligne soit necessaire maintenant…
 			activeUsers.changeStatus(login.getLogin(), "Online");
-			//add user from active users list of everyone
-			//TODO: if online do nothing 
-			SendUDP.send("[1BD]:" + login.toString(), InetAddress.getByName("255.255.255.255"), 20000, true);
 		} else if (location.equals("Extern")) {
 			String sourceIP = Main.externalUser.getLogin().getIp();
 			String username = Main.externalUser.getLogin().getLogin();
@@ -336,8 +343,8 @@ public class ChatController implements PropertyChangeListener {
 			activeUsers = Main.user.getActiveUsers();
 			login = Main.user.getLogin();
 			activeUsers.changeStatus(login.getLogin(), "Offline");
-			//remove user from active users list of everyone
-			SendUDP.send("[RAU]:" + login.toString(), InetAddress.getByName("255.255.255.255"), 20000, true);
+			//Send a broadcast to notify other users that you've got offline
+			SendUDP.send("[OFF]:" + login.toString(), InetAddress.getByName("255.255.255.255"), 20000, true);
 		} else if (location.equals("Extern")) {
 			String sourceIP = Main.externalUser.getLogin().getIp();
 			String username = Main.externalUser.getLogin().getLogin();
@@ -389,6 +396,13 @@ public class ChatController implements PropertyChangeListener {
 		} else if (event.getPropertyName().equals("deleteUser")) {
 			deleteUserHandler(event.getOldValue().toString(), event.getNewValue().toString());
 		}  else if (event.getPropertyName().equals("changeStatus")) {
+			try {
+				activeUsers.changeStatus(event.getOldValue().toString(), event.getNewValue().toString());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			updateTable();
 			tableView.refresh();
 		} else if (event.getPropertyName().equals("incomingMSG")) {
 			incomingMSG(event.getOldValue().toString(), event.getNewValue().toString());
@@ -514,6 +528,20 @@ public class ChatController implements PropertyChangeListener {
 			  e.printStackTrace(); 
 		}
 	}
+	
+	/**
+	 * It is supposed to update the table
+	 * Not tested yet 
+	 */
+	private void updateTable() {
+		if (location.equals("Intern")) {
+			activeUsers = Main.user.getActiveUsers(); 
+		} else {
+			activeUsers = Main.externalUser.getActiveUsers(); 
+		} 
+		addButtonToTable(); 
+	}
+	
 	/**
 	 * Starts a conversation with a given person
 	 * and handles the interface to display the conversation

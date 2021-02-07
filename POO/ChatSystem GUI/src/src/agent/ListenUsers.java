@@ -80,6 +80,12 @@ public class ListenUsers extends Thread {
 					//remove from active users 
                 	activeUsers.deleteUser(ipD, udpinfo[1]);
 			 
+                } else if ((udpinfo[0]).equals("[[OFF]]")){
+                	//Change status to Offline
+                	activeUsers.changeStatus(udpinfo[1], "Offline");
+                } if ((udpinfo[0]).equals("[[DND]]")){
+                	//Change status to Offline
+                	activeUsers.changeStatus(udpinfo[1], "Do Not Disturb");
                 } else {
 				  		System.out.println("[ListenUsers] Error header"); 
 				  
@@ -106,7 +112,10 @@ public class ListenUsers extends Thread {
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }
+        } catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 		  
