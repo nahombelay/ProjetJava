@@ -57,6 +57,10 @@ public class WebSocketClient extends Endpoint {
 					hs.addRowsToDatabase(e);
 				}
 				
+				else if (message.equals("[InvalidUsername])")){
+					//TODO: notifier interface que username n'est pas bon
+				}
+				
 				else if (message.substring(0, ("[UserUpdate]").length()).equals("[UserUpdate]")) {
 					String [] formatedMessage = message.split(":");
 					String ip = formatedMessage[1];

@@ -55,18 +55,28 @@ public class WebSocketListenUsers {
 				String statusSource = "Online";
 				String typeSource = formatedMessage[3]; //internal or external
 				String userInfo = "[NewUser]:" + ipSource + ":" + usernameSource + ":" + statusSource;
-				broadcastUserInfo(db, userInfo, formatedMessage[3]);
 				
-				String HTMLTable = usersHTMLTable(db, typeSource);
-				try {
-					//System.out.println(HTMLTable);
-					session.getBasicRemote().sendText(HTMLTable);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if (db.usernameExists(usernameSource, typeSource)) {
+					try {
+						session.getBasicRemote().sendText("[InvalidUsername]");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} else {
+					broadcastUserInfo(db, userInfo, formatedMessage[3]);
+					
+					String HTMLTable = usersHTMLTable(db, typeSource);
+					try {
+						//System.out.println(HTMLTable);
+						session.getBasicRemote().sendText(HTMLTable);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					db.addUser(ipSource, usernameSource, "Online", session.getId(), typeSource);
 				}
-				
-				db.addUser(ipSource, usernameSource, "Online", session.getId(), typeSource);
 				
 			} else if (messageHeader.equals("[UserUpdate]")) {
 				//FORMAT: [UserUpdate]:ip:username:status:table

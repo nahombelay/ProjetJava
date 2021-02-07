@@ -116,6 +116,31 @@ public class UsersDatabaseServer {
 		}
 	}
 	
+	public boolean usernameExists(String username, String table) {
+		boolean isPresent;
+		int count = 0;
+		String query = "SELECT COUNT(1) FROM " + table + " WHERE username = '" + username + "';";
+
+		try {
+			this.stm = c.createStatement();
+			this.rs = stm.executeQuery(query);
+			
+			while(rs.next()) {
+				count = rs.getInt(1);
+			}
+			
+			stm.close();
+			rs.close();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		isPresent = (count == 1);
+		return isPresent;
+	}
+	
 	public boolean isInTable(String sessionID, String table) {
 		boolean isPresent;
 		int count = 0;
