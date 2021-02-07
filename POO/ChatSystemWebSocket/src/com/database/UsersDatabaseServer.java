@@ -22,11 +22,11 @@ public class UsersDatabaseServer {
 		
 		String url = "jdbc:mysql://srv-bdens.insa-toulouse.fr:3306/tp_servlet_016?useSSL=false";
 		try {
-			//Class.forName("com.mysql.cj.jdbc.Driver");
+			Class.forName("com.mysql.jdbc.Driver");
 			c = DriverManager.getConnection(url, username, password);
 			//System.out.println("[" + this.getClass().toString() + "] Connection OK");
 	
-		} catch ( SQLException  e) {
+		} catch ( SQLException | ClassNotFoundException  e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -37,10 +37,10 @@ public class ExternalUser {
 	
 	private WebSocketClient endpoint;
 	
-
-	private Session session;
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 	//private final static String IP = "192.168.1.1";
+	
+	private Session session;
 	
 	public ExternalUser() {
 		this.settingIPInfo();
@@ -115,6 +115,7 @@ public class ExternalUser {
         }
 	};
 	
+	
 	private void websocketThread() {
 		
 		this.endpoint = new WebSocketClient(messageDB); 
@@ -122,7 +123,8 @@ public class ExternalUser {
  		WebSocketContainer container = ContainerProvider.getWebSocketContainer();
 		
 		try {	
-			this.session = container.connectToServer(endpoint, new URI("ws://localhost:8080/ChatSystemWebSocket/ListenUsers"));
+			this.session = container.connectToServer(endpoint, new URI("ws://10.1.5.2/ChatSystemWebSocket/ListenUsers/"));
+			//this.session = container.connectToServer(endpoint, new URI("ws://localhost:8080/ChatSystemWebSocket/ListenUsers"));
 		} catch (DeploymentException | IOException | URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -3,9 +3,7 @@ import java.io.IOException;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
-import javax.websocket.OnMessage;
 import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
 
 
 public class ProgrammaticEchoServer extends Endpoint {

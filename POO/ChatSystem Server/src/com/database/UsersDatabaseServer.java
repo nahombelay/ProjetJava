@@ -9,9 +9,7 @@ import java.sql.Statement;
 public class UsersDatabaseServer {
 	
 	private Connection c = null;
-	private Statement stm = null;
 	private PreparedStatement pstm = null;
-	private ResultSet rs = null;
 	@SuppressWarnings("unused")
 	private int rowsModified = 0;
 	private String username = "tp_servlet_016";

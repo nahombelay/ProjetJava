@@ -128,8 +128,7 @@ public class ChatController implements PropertyChangeListener {
 	private WebSocketClient endpoint = null; 
 	
 	
-	//Methods
-	
+
 	@FXML
 	private void initialize() throws ClassNotFoundException, SQLException, IOException {
 		if (location.equals("Intern")) {

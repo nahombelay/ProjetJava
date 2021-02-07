@@ -48,9 +48,9 @@ public class WebSocketClient extends Endpoint {
 			@Override
 			public void onMessage(String message) {
 				// TODO Auto-generated method stub
-				System.out.println("!!!!!!!!! retrieved: " + message);
+				//System.out.println("!!!!!!!!! retrieved: " + message);
 				ActiveUsersDB usersDatabase = new ActiveUsersDB();
-				System.out.println(message.substring(0,7));
+				//System.out.println(message.substring(0,7));
 				if (message.substring(0,6).equals("<table")) {
 					HTMLscrapper hs = new HTMLscrapper(message);
 					Elements e = hs.getTable();

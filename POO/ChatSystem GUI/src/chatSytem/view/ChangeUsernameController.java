@@ -21,12 +21,16 @@ public class ChangeUsernameController {
 	@FXML
 	private Label userTaken;
 	
-	private ActiveUsersDB activeUsers;
 	
 	public void buttonHandler() throws UnknownHostException, IOException {
 		String newUsername = textField.getText();
-		this.activeUsers = Main.user.getActiveUsers();
-		boolean usernameChanged = Main.user.changeUsername(newUsername);
+		boolean usernameChanged = false;
+		if (ConnexionController.toogleGroupValue.equals("Intern")) {
+			usernameChanged = Main.user.changeUsername(newUsername);
+		} else {
+			usernameChanged = Main.externalUser.changeUsername(newUsername, "Online");
+		}
+		
 		if (usernameChanged) {
 			System.out.println("[Change Username Controller] Username changed to : " + newUsername);
 			//Close the UI
