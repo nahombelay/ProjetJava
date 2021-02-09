@@ -30,12 +30,14 @@ import src.scrapper.HTMLscrapper;
 @ClientEndpoint
 public class WebSocketClient extends Endpoint {
 	private MessagesDB messagesDB;
+	private ActiveUsersDB usersDatabase;
 	private Session session;
 	
 	private List<PropertyChangeListener> listener = new ArrayList<PropertyChangeListener>();
 	
-	public WebSocketClient(MessagesDB messageDB) {
+	public WebSocketClient(MessagesDB messageDB, ActiveUsersDB usersDatabase) {
 		this.messagesDB = messageDB;
+		this.usersDatabase = usersDatabase;
 	}
 
 
@@ -49,7 +51,7 @@ public class WebSocketClient extends Endpoint {
 			public void onMessage(String message) {
 				// TODO Auto-generated method stub
 				//System.out.println("!!!!!!!!! retrieved: " + message);
-				ActiveUsersDB usersDatabase = new ActiveUsersDB();
+				
 				//System.out.println(message.substring(0,7));
 				if (message.substring(0,6).equals("<table")) {
 					HTMLscrapper hs = new HTMLscrapper(message);
@@ -155,7 +157,7 @@ public class WebSocketClient extends Endpoint {
 //	}
 	
 	public static void main (String[] argv) {
-		WebSocketClient endpoint = new WebSocketClient(new MessagesDB()); 
+		WebSocketClient endpoint = new WebSocketClient(new MessagesDB(), new ActiveUsersDB()); 
 		Session sess = null;
 		
  		WebSocketContainer container = ContainerProvider.getWebSocketContainer();

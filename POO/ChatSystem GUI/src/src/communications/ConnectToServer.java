@@ -24,7 +24,7 @@ public class ConnectToServer {
 	
 	public ConnectToServer() {
 		//TODO: verifier qu'on n'utilise pas
-		endpoint = new WebSocketClient(null); 
+		endpoint = new WebSocketClient(null, null); 
  		container = ContainerProvider.getWebSocketContainer();
  		
  		try {	

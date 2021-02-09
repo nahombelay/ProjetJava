@@ -118,13 +118,13 @@ public class ExternalUser {
 	
 	private void websocketThread() {
 		
-		this.endpoint = new WebSocketClient(messageDB); 
+		this.endpoint = new WebSocketClient(messageDB, activeUsers); 
 		
  		WebSocketContainer container = ContainerProvider.getWebSocketContainer();
 		
 		try {	
-			this.session = container.connectToServer(endpoint, new URI("ws://10.1.5.2/ChatSystemWebSocket/ListenUsers/"));
-			//this.session = container.connectToServer(endpoint, new URI("ws://localhost:8080/ChatSystemWebSocket/ListenUsers"));
+			//this.session = container.connectToServer(endpoint, new URI("ws://10.1.5.2/ChatSystemWebSocket/ListenUsers/"));
+			this.session = container.connectToServer(endpoint, new URI("ws://localhost:8080/ChatSystemWebSocket/ListenUsers"));
 		} catch (DeploymentException | IOException | URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -147,10 +147,6 @@ public class ExternalUser {
         return null;
     }
 	
-	@OnMessage
-	public void onTextMessage(String message, Session session) {
-		System.out.println(message);
-	}
 	
 	public static void main(String[] args) throws UnknownHostException, IOException {
 		@SuppressWarnings("unused")
