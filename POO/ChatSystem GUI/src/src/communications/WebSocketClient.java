@@ -55,10 +55,16 @@ public class WebSocketClient extends Endpoint {
 					HTMLscrapper hs = new HTMLscrapper(message);
 					Elements e = hs.getTable();
 					hs.addRowsToDatabase(e);
-				}
-				
-				else if (message.equals("[InvalidUsername])")){
+				} else if (message.equals("[InvalidUsername])")){
 					//TODO: notifier interface que username n'est pas bon
+				} else if (message.substring(0, ("[NewUser]").length()).equals("[NewUser]")){
+					String [] formatedMessage = message.split(":");
+					String ip = formatedMessage[1];
+					String username = formatedMessage[2];
+					String status = formatedMessage[3];
+					
+					usersDatabase.addUser(ip, username);
+					
 				}
 				
 				else if (message.substring(0, ("[UserUpdate]").length()).equals("[UserUpdate]")) {
@@ -66,6 +72,7 @@ public class WebSocketClient extends Endpoint {
 					String ip = formatedMessage[1];
 					String username = formatedMessage[2];
 					String status = formatedMessage[3];
+					
 					usersDatabase.updateUser(ip, username);
 					try {
 						usersDatabase.changeStatus(username, status);
@@ -73,6 +80,8 @@ public class WebSocketClient extends Endpoint {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					
+					
 				}
 					
 					//TODO: if message is textmessage
