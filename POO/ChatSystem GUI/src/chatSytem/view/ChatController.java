@@ -472,6 +472,7 @@ public class ChatController implements PropertyChangeListener {
 			}
 			list.remove(index);
 		}
+		activeUsers.deleteUser(ip, username);
 		tableView.setItems(list);
 		addButtonToTable();
 	}
@@ -597,6 +598,7 @@ public class ChatController implements PropertyChangeListener {
 			textArea.setText(null);
 			sendMessage();
 			Socket sock = convList.getSocket(ip);
+			deleteUserHandler(ip, activeUsers.getCurrentUsername(ip));
 			convList.removeConv(ip, sock);
 			textArea.setText("");
 		}
