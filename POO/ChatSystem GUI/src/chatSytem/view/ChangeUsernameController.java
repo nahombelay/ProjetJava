@@ -3,7 +3,7 @@ package chatSytem.view;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import chatSytem.Main;
+import ChatSystem.gui.Main;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
