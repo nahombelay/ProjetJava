@@ -27,7 +27,6 @@ public class InitiateConversation extends Thread{
 	
 	public void close() {
 		ConversationInput.stop = true;
-		ConversationOutput.stop = true;
 	}
 	
 	public Socket getSocket() {

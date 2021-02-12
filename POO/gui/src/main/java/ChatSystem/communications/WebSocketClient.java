@@ -26,6 +26,7 @@ import ChatSystem.database.ActiveUsersDB;
 import ChatSystem.database.MessagesDB;
 import ChatSystem.scrapper.HTMLscrapper;
 
+@SuppressWarnings("unused")
 @ClientEndpoint
 public class WebSocketClient extends Endpoint {
 	private MessagesDB messagesDB;
@@ -48,15 +49,12 @@ public class WebSocketClient extends Endpoint {
 
 			@Override
 			public void onMessage(String message) {
-				// TODO Auto-generated method stub
-				//System.out.println("!!!!!!!!! retrieved: " + message);
-				//System.out.println(message.substring(0,7));
 				if (message.substring(0,6).equals("<table")) {
 					HTMLscrapper hs = new HTMLscrapper(message);
 					Elements e = hs.getTable();
 					hs.addRowsToDatabase(e);
-				} else if (message.equals("[InvalidUsername])")){
-					//TODO: notifier interface que username n'est pas bon
+				} else if (message.equals("[InvalidUsername]")){
+					System.out.println("Username Taken");
 				} else if (message.substring(0, ("[NewUser]").length()).equals("[NewUser]")){
 					String [] formatedMessage = message.split(":");
 					String ip = formatedMessage[1];
@@ -64,9 +62,7 @@ public class WebSocketClient extends Endpoint {
 					
 					usersDatabase.addUser(ip, username);
 					
-				}
-				
-				else if (message.substring(0, ("[UserUpdate]").length()).equals("[UserUpdate]")) {
+				} else if (message.substring(0, ("[UserUpdate]").length()).equals("[UserUpdate]")) {
 					String [] formatedMessage = message.split(":");
 					String ip = formatedMessage[1];
 					String username = formatedMessage[2];
@@ -81,10 +77,7 @@ public class WebSocketClient extends Endpoint {
 					}
 					
 					
-				}
-					
-					//TODO: if message is textmessage
-				else {
+				} else {
 					//[FORWARDED]:sender:message
 					String [] formatedMessage = message.split(":");
 					String sender = formatedMessage[1];
@@ -126,37 +119,37 @@ public class WebSocketClient extends Endpoint {
 	}
 	
 	
-	public static void main (String[] argv) {
-		WebSocketClient endpoint = new WebSocketClient(new MessagesDB(), new ActiveUsersDB()); 
-		Session sess = null;
-		
- 		WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-		
-		try {	
-			sess = container.connectToServer(endpoint, new URI("ws://localhost:8080/ChatSystemWebSocket/ListenUsers"));
-		} catch (DeploymentException | IOException | URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			endpoint.sendMessage("[NewUser]:11.1.2.1:lolo:Online:ExternalUsers");
-			System.out.println("New user sent");
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		try {
-			Thread.sleep(100000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			sess.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+//	public static void main (String[] argv) {
+//		WebSocketClient endpoint = new WebSocketClient(new MessagesDB(), new ActiveUsersDB()); 
+//		Session sess = null;
+//		
+// 		WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+//		
+//		try {	
+//			sess = container.connectToServer(endpoint, new URI("ws://localhost:8080/ChatSystemWebSocket/ListenUsers"));
+//		} catch (DeploymentException | IOException | URISyntaxException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		try {
+//			endpoint.sendMessage("[NewUser]:11.1.2.1:lolo:Online:ExternalUsers");
+//			System.out.println("New user sent");
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
+//		
+//		try {
+//			Thread.sleep(100000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		try {
+//			sess.close();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
 }
