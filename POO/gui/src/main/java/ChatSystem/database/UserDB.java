@@ -33,7 +33,7 @@ public class UserDB {
 			c = DriverManager.getConnection(url);
 			System.out.println("[" + this.getClass().toString() + "] Connection OK");
 
-		} catch (ClassNotFoundException | SQLException e) {
+		} catch (SQLException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -310,29 +310,29 @@ public class UserDB {
     }
 	
 	
-//	  public static void main (String argv[]) { UserDB bd = new UserDB();
-//	  //bd.printUsers();
-//	  
-//	  System.out.println("-----------"); bd.addUser("123.123.123.123", "toto");
-//	  bd.printUsers();
-//	  
-//	  System.out.println("-----------");
-//	  System.out.println(bd.hasKey("123.123.123.123"));
-//	  
-//	  
-//	  System.out.println("-----------");
-//	  
-//	  bd.updateUser("123.123.123.123", "titi");
-//	  
-//	  bd.printUsers(); System.out.println("-----------");
-//	  
-//	  bd.deleteUser("123.123.123.123", "titi"); bd.printUsers();
-//	  
-//	  bd.dropUsers();
-//	  
-//	  bd.closeConnection();
-//	  
-//	  }
+	  public static void main (String argv[]) { UserDB bd = new UserDB();
+	  //bd.printUsers();
+	  
+	  System.out.println("-----------"); bd.addUser("123.123.123.123", "toto");
+	  bd.printUsers();
+	  
+	  System.out.println("-----------");
+	  System.out.println(bd.hasKey("123.123.123.123"));
+	  
+	  
+	  System.out.println("-----------");
+	  
+	  bd.updateUser("123.123.123.123", "titi");
+	  
+	  bd.printUsers(); System.out.println("-----------");
+	  
+	  bd.deleteUser("123.123.123.123", "titi"); bd.printUsers();
+	  
+	  bd.dropUsers();
+	  
+	  bd.closeConnection();
+	  
+	  }
 	 
 	 
 	 

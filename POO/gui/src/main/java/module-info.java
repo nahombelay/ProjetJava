@@ -6,6 +6,7 @@ module ChatSystem.gui {
 	requires transitive java.desktop;
 	requires java.sql;
 	requires tyrus.standalone.client;
+	
 
     opens ChatSystem.gui to javafx.fxml;
     exports ChatSystem.gui;
