@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 
@@ -12,6 +13,7 @@ public class MessagesDB  {
 	
 	private  Connection c = null;
 	private  PreparedStatement pstm = null;
+	private Statement stm = null;
 	@SuppressWarnings("unused")
 	private  int rowsModified = 0;
 	protected String table = "";
@@ -66,6 +68,20 @@ public class MessagesDB  {
 		}
 	}
 	
+	public void clearMessages() {
+		try {
+			this.stm = c.createStatement();
+			this.rowsModified = stm.executeUpdate("DELETE FROM " + table + ";");
+
+			stm.close();
+			
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public ArrayList<ArrayList<String>> getMessages(String ipDest) {
 		ArrayList<String> textArray = new ArrayList<String>();
 		ArrayList<String> timeArray = new ArrayList<String>();
@@ -112,7 +128,7 @@ public class MessagesDB  {
 	}
 	
 	public static void main(String[] args) {  
-		new MessagesDB();
+		new MessagesDB().clearMessages();
 	} 
 	
 	
