@@ -1,14 +1,12 @@
-package chatSytem.view;
+package ChatSystem.gui;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import ChatSystem.gui.Main;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import src.database.ActiveUsersDB;
 
 public class ChangeUsernameController {
 	

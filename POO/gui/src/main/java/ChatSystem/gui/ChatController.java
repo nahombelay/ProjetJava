@@ -1,4 +1,4 @@
-package chatSytem.view;
+package ChatSystem.gui;
 
 
 import java.beans.PropertyChangeEvent;
@@ -12,7 +12,6 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import ChatSystem.gui.Main;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,16 +22,16 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import src.agent.ConversationInput;
-import src.agent.InitiateConversation;
-import src.agent.ListenSocket;
-import src.agent.MainSocket;
-import src.communications.SendUDP;
-import src.communications.WebSocketClient;
-import src.database.ActiveUsersDB;
-import src.database.MessagesDB;
-import src.messages.Timestamp;
-import src.user.Login;
+import ChatSystem.agent.ConversationInput;
+import ChatSystem.agent.InitiateConversation;
+import ChatSystem.agent.ListenSocket;
+import ChatSystem.agent.MainSocket;
+import ChatSystem.communications.SendUDP;
+import ChatSystem.communications.WebSocketClient;
+import ChatSystem.database.ActiveUsersDB;
+import ChatSystem.database.MessagesDB;
+import ChatSystem.messages.Timestamp;
+import ChatSystem.user.Login;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
@@ -472,7 +471,6 @@ public class ChatController implements PropertyChangeListener {
 			}
 			list.remove(index);
 		}
-		activeUsers.deleteUser(ip, username);
 		tableView.setItems(list);
 		addButtonToTable();
 	}
@@ -598,7 +596,7 @@ public class ChatController implements PropertyChangeListener {
 			textArea.setText(null);
 			sendMessage();
 			Socket sock = convList.getSocket(ip);
-			deleteUserHandler(ip, activeUsers.getCurrentUsername(ip));
+			activeUsers.deleteUser(ip, activeUsers.getCurrentUsername(ip));
 			convList.removeConv(ip, sock);
 			textArea.setText("");
 		}

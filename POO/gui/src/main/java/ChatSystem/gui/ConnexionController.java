@@ -1,6 +1,5 @@
-package chatSytem.view;
+package ChatSystem.gui;
 
-import ChatSystem.gui.Main;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -9,9 +8,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-import src.database.ActiveUsersDB;
-import src.user.ExternalUser;
-import src.user.User;
+import ChatSystem.database.ActiveUsersDB;
+import ChatSystem.user.ExternalUser;
+import ChatSystem.user.User;
 
 public class ConnexionController {
 	
