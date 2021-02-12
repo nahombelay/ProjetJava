@@ -39,19 +39,14 @@ public class WebSocketListenUsers {
 	public void onTextMessage(String message, Session session) {
 		
 		if(this.session != null & this.session.isOpen()) {
-			//System.out.println("Message = " + message + " par session: " + session.getId());
-			
-			
 			String [] formatedMessage = message.split(":");
 			String messageHeader = formatedMessage[0];
 			int messageLength = formatedMessage.length;
 			
 			if (messageHeader.equals("[NewUser]")) {
-				//format: [NewUser]:ip:username:status:internal/external
 				//format: [NewUser]:ip:username:internal/external -> by default online
 				String ipSource = formatedMessage[1];
 				String usernameSource = formatedMessage[2];
-				//String statusSource = formatedMessage[3];
 				String statusSource = "Online";
 				String typeSource = formatedMessage[3]; //internal or external
 				String userInfo = "[NewUser]:" + ipSource + ":" + usernameSource + ":" + statusSource;
@@ -68,7 +63,6 @@ public class WebSocketListenUsers {
 					
 					String HTMLTable = usersHTMLTable(db, typeSource);
 					try {
-						//System.out.println(HTMLTable);
 						session.getBasicRemote().sendText(HTMLTable);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block

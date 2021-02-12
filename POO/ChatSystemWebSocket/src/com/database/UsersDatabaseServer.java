@@ -24,11 +24,8 @@ public class UsersDatabaseServer {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			c = DriverManager.getConnection(url, username, password);
-			//System.out.println("[" + this.getClass().toString() + "] Connection OK");
 	
 		} catch ( SQLException | ClassNotFoundException  e) {
-			//catch ( SQLException  e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -46,7 +43,6 @@ public class UsersDatabaseServer {
 			this.pstm.close();
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -58,9 +54,7 @@ public class UsersDatabaseServer {
 
 			stm.close();
 			
-			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -72,7 +66,6 @@ public class UsersDatabaseServer {
 			
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -89,7 +82,6 @@ public class UsersDatabaseServer {
 			this.pstm.close();
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
