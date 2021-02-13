@@ -120,8 +120,8 @@ public class ExternalUser {
  		WebSocketContainer container = ContainerProvider.getWebSocketContainer();
 		
 		try {	
-			this.session = container.connectToServer(endpoint, new URI("ws://10.1.5.2/ChatSystemWebSocket/ListenUsers/"));
-			//this.session = container.connectToServer(endpoint, new URI("ws://localhost:8080/ChatSystemWebSocket/ListenUsers"));
+			//this.session = container.connectToServer(endpoint, new URI("ws://10.1.5.2/ChatSystemWebSocket/ListenUsers/"));
+			this.session = container.connectToServer(endpoint, new URI("ws://localhost:8080/ChatSystemWebSocket/ListenUsers"));
 		} catch (DeploymentException | IOException | URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
